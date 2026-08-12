@@ -28,8 +28,19 @@ spec:
       imagePullSecrets:
         - name: ecr-registry-secret
 
-      topologySpreadConstraints:
+      # Run ShopRupee only on worker nodes
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: shoprupee-worker
+                    operator: In
+                    values:
+                      - "true"
 
+      # Keep pods balanced across worker1 and worker2
+      topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
           whenUnsatisfiable: DoNotSchedule
@@ -37,6 +48,9 @@ spec:
           labelSelector:
             matchLabels:
               app: shoprupee
+
+          nodeAffinityPolicy: Honor
+          nodeTaintsPolicy: Honor
 
       containers:
 
