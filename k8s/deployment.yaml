@@ -1,1 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
 
+metadata:
+  name: shoprupee
+  namespace: shoprupee
+
+spec:
+
+  replicas: 4
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+
+  selector:
+    matchLabels:
+      app: shoprupee
+
+  template:
+
+    metadata:
+      labels:
+        app: shoprupee
+
+    spec:
+
+      # Keep application pods on worker nodes
+      # and distribute them across the workers.
+      affinity:
+
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+
+            nodeSelectorTerms:
+
+              - matchExpressions:
+
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: DoesNotExist
+
+                  - key: node-role.kubernetes.io/master
+                    operator: DoesNotExist
+
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+
+            - weight: 100
+
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+
+                labelSelector:
+                  matchLabels:
+                    app: shoprupee
+
+      # Keep the replica distribution balanced
+      # between the two worker nodes.
+      topologySpreadConstraints:
+
+        - maxSkew: 1
+
+          topologyKey: kubernetes.io/hostname
+
+          whenUnsatisfiable: DoNotSchedule
+
+          labelSelector:
+            matchLabels:
+              app: shoprupee
+
+      containers:
+
+        - name: shoprupee
+
+          image: SHOPRUPEE_ECR_IMAGE
+
+          imagePullPolicy: Always
+
+          ports:
+
+            - containerPort: 80
+              protocol: TCP
+
+          resources:
+
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+          readinessProbe:
+
+            httpGet:
+              path: /
+              port: 80
+
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          livenessProbe:
+
+            httpGet:
+              path: /
+              port: 80
+
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
