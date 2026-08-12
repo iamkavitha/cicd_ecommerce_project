@@ -104,33 +104,28 @@ pipeline {
             }
         }
 
-        stage('Deploy Namespace') {
-            steps {
-                withCredentials([
-                    file(
-                        credentialsId: "${K8S_CREDENTIAL}",
-                        variable: 'KUBECONFIG_FILE'
-                    )
-                ]) {
+       stage('Deploy Namespace') {
+    steps {
+        withCredentials([file(credentialsId: 'shoprupee-kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+            sh '''
+                set -e
+                export KUBECONFIG="$KUBECONFIG_FILE"
 
-                    sh '''
-                        set -e
+                echo "======================================"
+                echo "Checking Kubernetes Access"
+                echo "======================================"
 
-                        export KUBECONFIG="${KUBECONFIG_FILE}"
+                kubectl get pods -n shoprupee
 
-                        echo "======================================"
-                        echo "Checking Kubernetes Cluster"
-                        echo "======================================"
+                echo "Checking Deployment Permission..."
+                kubectl auth can-i create deployments -n shoprupee
 
-                        kubectl get nodes
-
-                        echo "Creating/updating namespace..."
-
-                        kubectl apply -f k8s/namespace.yaml
-                    '''
-                }
-            }
+                echo "Checking Secret Permission..."
+                kubectl auth can-i create secrets -n shoprupee
+            '''
         }
+    }
+}
 
         stage('Create ECR Pull Secret') {
             steps {
