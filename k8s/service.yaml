@@ -1,74 +1,19 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 
 metadata:
   name: shoprupee
   namespace: shoprupee
 
 spec:
-  replicas: 4
-
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
+  type: NodePort
 
   selector:
-    matchLabels:
-      app: shoprupee
+    app: shoprupee
 
-  template:
-    metadata:
-      labels:
-        app: shoprupee
-
-    spec:
-
-      imagePullSecrets:
-        - name: ecr-registry-secret
-
-      topologySpreadConstraints:
-        - maxSkew: 0
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              app: shoprupee
-
-      containers:
-        - name: shoprupee
-
-          image: SHOPRUPEE_ECR_IMAGE
-
-          imagePullPolicy: Always
-
-          ports:
-            - containerPort: 80
-
-          readinessProbe:
-            httpGet:
-              path: /nginx-health
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            timeoutSeconds: 2
-            failureThreshold: 3
-
-          livenessProbe:
-            httpGet:
-              path: /nginx-health
-              port: 80
-            initialDelaySeconds: 15
-            periodSeconds: 10
-            timeoutSeconds: 2
-            failureThreshold: 3
-
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-
-            limits:
-              cpu: 250m
-              memory: 128Mi
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080
