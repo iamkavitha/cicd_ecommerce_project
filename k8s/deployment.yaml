@@ -25,6 +25,10 @@ spec:
 
     spec:
 
+      # INTENTIONALLY WRONG - FOR PENDING TEST
+      nodeSelector:
+        training-node: does-not-exist
+
       imagePullSecrets:
         - name: ecr-registry-secret
 
