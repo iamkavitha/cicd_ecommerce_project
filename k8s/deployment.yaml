@@ -40,19 +40,19 @@ spec:
             - containerPort: 80
               protocol: TCP
 
-          # INTENTIONALLY WRONG HEALTH PATH
           readinessProbe:
             httpGet:
-              path: /wrong-health
+              path: /nginx-health
               port: 80
             initialDelaySeconds: 5
             periodSeconds: 5
             timeoutSeconds: 2
             failureThreshold: 3
 
+          # INTENTIONALLY WRONG HEALTH PATH
           livenessProbe:
             httpGet:
-              path: /nginx-health
+              path: /wrong-health
               port: 80
             initialDelaySeconds: 15
             periodSeconds: 10
