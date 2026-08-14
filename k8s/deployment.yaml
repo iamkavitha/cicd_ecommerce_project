@@ -36,6 +36,16 @@ spec:
 
           imagePullPolicy: Always
 
+          # INTENTIONALLY WRONG
+          command:
+            - nginx
+
+          args:
+            - -c
+            - /etc/nginx/conf.d/does-not-exist.conf
+            - -g
+            - daemon off;
+
           ports:
             - containerPort: 80
               protocol: TCP
