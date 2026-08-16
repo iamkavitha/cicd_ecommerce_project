@@ -6,44 +6,30 @@ pipeline {
 
     environment {
 
-        // =====================================================
-        // AWS / ECR
-        // =====================================================
+        AWS_REGION = 'ap-south-1'
 
-        AWS_REGION     = 'ap-south-1'
-
-        ECR_REGISTRY   = '931527443397.dkr.ecr.ap-south-1.amazonaws.com'
+        AWS_ACCOUNT_ID = '931527443397'
 
         ECR_REPOSITORY = 'shoprupee'
 
-        IMAGE = "${ECR_REGISTRY}/${ECR_REPOSITORY}:${BUILD_NUMBER}"
+        ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
+        ECR_IMAGE = "${ECR_REGISTRY}/${ECR_REPOSITORY}"
 
-        // =====================================================
-        // Kubernetes
-        // =====================================================
+        NAMESPACE = 'shoprupee'
 
-        K8S_NAMESPACE  = 'shoprupee'
+        HELM_RELEASE = 'shoprupee'
 
-        K8S_CREDENTIAL = 'shoprupee-kubeconfig'
+        HELM_CHART = './helm/shoprupee'
 
+        KUBECONFIG_CREDENTIAL = 'shoprupee-kubeconfig'
 
-        // =====================================================
-        // Helm
-        // =====================================================
-
-        HELM_RELEASE   = 'shoprupee'
-
-        HELM_CHART     = './helm/shoprupee'
+        IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
 
     stages {
 
-
-        // =====================================================
-        // 1. VERIFY TOOLS
-        // =====================================================
 
         stage('Verify Tools') {
 
@@ -83,10 +69,6 @@ pipeline {
         }
 
 
-        // =====================================================
-        // 2. VERIFY AWS IDENTITY
-        // =====================================================
-
         stage('Verify AWS Identity') {
 
             steps {
@@ -104,9 +86,32 @@ pipeline {
         }
 
 
-        // =====================================================
-        // 3. VERIFY HELM CHART
-        // =====================================================
+        stage('Verify Helm Chart') {
+
+            steps {
+
+                sh '''
+                    set -e
+
+                    echo "======================================"
+                    echo "VERIFY HELM CHART"
+                    echo "======================================"
+
+                    echo ""
+                    echo "Chart files:"
+                    ls -la ${HELM_CHART}
+
+                    echo ""
+                    echo "Template files:"
+                    ls -la ${HELM_CHART}/templates
+
+                    echo ""
+                    echo "Chart.yaml:"
+                    cat ${HELM_CHART}/Chart.yaml
+                '''
+            }
+        }
+
 
         stage('Helm Lint') {
 
@@ -120,17 +125,10 @@ pipeline {
                     echo "======================================"
 
                     helm lint ${HELM_CHART}
-
-                    echo ""
-                    echo "Helm chart validation successful."
                 '''
             }
         }
 
-
-        // =====================================================
-        // 4. DOCKER BUILD
-        // =====================================================
 
         stage('Docker Build') {
 
@@ -140,31 +138,27 @@ pipeline {
                     set -e
 
                     echo "======================================"
-                    echo "BUILDING SHOPRUPEE DOCKER IMAGE"
+                    echo "DOCKER BUILD"
                     echo "======================================"
 
-                    echo "Image:"
-                    echo "${IMAGE}"
+                    echo "Building image:"
+                    echo "${ECR_IMAGE}:${IMAGE_TAG}"
 
                     docker build \
-                        -t ${IMAGE} .
+                        -t ${ECR_IMAGE}:${IMAGE_TAG} \
+                        .
 
                     docker tag \
-                        ${IMAGE} \
-                        ${ECR_REGISTRY}/${ECR_REPOSITORY}:latest
+                        ${ECR_IMAGE}:${IMAGE_TAG} \
+                        ${ECR_IMAGE}:latest
 
                     echo ""
                     echo "Docker images:"
-
                     docker images | grep shoprupee
                 '''
             }
         }
 
-
-        // =====================================================
-        // 5. ECR LOGIN
-        // =====================================================
 
         stage('ECR Login') {
 
@@ -174,25 +168,20 @@ pipeline {
                     set -e
 
                     echo "======================================"
-                    echo "LOGGING IN TO AMAZON ECR"
+                    echo "ECR LOGIN"
                     echo "======================================"
 
                     aws ecr get-login-password \
-                        --region ${AWS_REGION} | \
-                    docker login \
+                        --region ${AWS_REGION} \
+                    | docker login \
                         --username AWS \
                         --password-stdin ${ECR_REGISTRY}
 
-                    echo ""
                     echo "ECR login successful."
                 '''
             }
         }
 
-
-        // =====================================================
-        // 6. PUSH IMAGE TO ECR
-        // =====================================================
 
         stage('Push Image to ECR') {
 
@@ -202,40 +191,30 @@ pipeline {
                     set -e
 
                     echo "======================================"
-                    echo "PUSHING IMAGE TO ECR"
+                    echo "PUSH IMAGE TO ECR"
                     echo "======================================"
 
-                    docker push ${IMAGE}
+                    docker push ${ECR_IMAGE}:${IMAGE_TAG}
 
-                    docker push \
-                        ${ECR_REGISTRY}/${ECR_REPOSITORY}:latest
-
-                    echo ""
-                    echo "Image pushed successfully."
+                    docker push ${ECR_IMAGE}:latest
 
                     echo ""
-                    echo "Image:"
-                    echo "${IMAGE}"
+                    echo "Image pushed successfully:"
+                    echo "${ECR_IMAGE}:${IMAGE_TAG}"
                 '''
             }
         }
 
-
-        // =====================================================
-        // 7. CHECK KUBERNETES ACCESS
-        // =====================================================
 
         stage('Verify Kubernetes Access') {
 
             steps {
 
                 withCredentials([
-
                     file(
-                        credentialsId: "${K8S_CREDENTIAL}",
+                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
                         variable: 'KUBECONFIG_FILE'
                     )
-
                 ]) {
 
                     sh '''
@@ -248,43 +227,42 @@ pipeline {
                         echo "======================================"
 
                         echo ""
-                        echo "Current Kubernetes context:"
-
+                        echo "Current Context:"
                         kubectl config current-context
 
                         echo ""
-                        echo "Kubernetes nodes:"
-
-                        kubectl get nodes
-
-                        echo ""
-                        echo "Checking namespace:"
-
-                        kubectl get namespace ${K8S_NAMESPACE}
+                        echo "Namespace:"
+                        kubectl get namespace ${NAMESPACE}
 
                         echo ""
-                        echo "Kubernetes authentication successful."
+                        echo "Deployments:"
+                        kubectl get deployments -n ${NAMESPACE}
+
+                        echo ""
+                        echo "Pods:"
+                        kubectl get pods -n ${NAMESPACE}
+
+                        echo ""
+                        echo "Services:"
+                        kubectl get services -n ${NAMESPACE}
+
+                        echo ""
+                        echo "Kubernetes access successful."
                     '''
                 }
             }
         }
 
-
-        // =====================================================
-        // 8. CHECK RBAC PERMISSIONS
-        // =====================================================
 
         stage('Verify Kubernetes RBAC') {
 
             steps {
 
                 withCredentials([
-
                     file(
-                        credentialsId: "${K8S_CREDENTIAL}",
+                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
                         variable: 'KUBECONFIG_FILE'
                     )
-
                 ]) {
 
                     sh '''
@@ -293,70 +271,65 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "KUBERNETES RBAC CHECK"
+                        echo "VERIFY KUBERNETES RBAC"
                         echo "======================================"
 
                         echo ""
-                        echo "Current Kubernetes identity:"
-
-                        kubectl auth whoami || true
-
-                        echo ""
-                        echo "Deployment permissions:"
-
-                        kubectl auth can-i \
-                            create deployments \
-                            -n ${K8S_NAMESPACE}
-
-                        kubectl auth can-i \
-                            update deployments \
-                            -n ${K8S_NAMESPACE}
+                        echo "Current user:"
+                        kubectl auth whoami
 
                         echo ""
-                        echo "Service permissions:"
-
-                        kubectl auth can-i \
-                            create services \
-                            -n ${K8S_NAMESPACE}
-
-                        kubectl auth can-i \
-                            update services \
-                            -n ${K8S_NAMESPACE}
+                        echo "Deployment GET:"
+                        kubectl auth can-i get deployments \
+                            -n ${NAMESPACE}
 
                         echo ""
-                        echo "Secret permissions:"
-
-                        kubectl auth can-i \
-                            create secrets \
-                            -n ${K8S_NAMESPACE}
-
-                        kubectl auth can-i \
-                            update secrets \
-                            -n ${K8S_NAMESPACE}
+                        echo "Deployment UPDATE:"
+                        kubectl auth can-i update deployments \
+                            -n ${NAMESPACE}
 
                         echo ""
-                        echo "RBAC check completed."
+                        echo "Deployment PATCH:"
+                        kubectl auth can-i patch deployments \
+                            -n ${NAMESPACE}
+
+                        echo ""
+                        echo "Pods GET:"
+                        kubectl auth can-i get pods \
+                            -n ${NAMESPACE}
+
+                        echo ""
+                        echo "Services CREATE:"
+                        kubectl auth can-i create services \
+                            -n ${NAMESPACE}
+
+                        echo ""
+                        echo "Secrets CREATE:"
+                        kubectl auth can-i create secrets \
+                            -n ${NAMESPACE}
+
+                        echo ""
+                        echo "ReplicaSets GET:"
+                        kubectl auth can-i get replicasets \
+                            -n ${NAMESPACE}
+
+                        echo ""
+                        echo "RBAC verification completed."
                     '''
                 }
             }
         }
 
-
-        // =====================================================
-        // 9. CREATE / UPDATE ECR PULL SECRET
-        // =====================================================
 
         stage('Create ECR Pull Secret') {
 
             steps {
 
                 withCredentials([
-
                     file(
-                        credentialsId: "${K8S_CREDENTIAL}",
+                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
                         variable: 'KUBECONFIG_FILE'
                     )
-
                 ]) {
 
                     sh '''
@@ -365,77 +338,70 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "CREATING / UPDATING ECR PULL SECRET"
+                        echo "CREATE ECR PULL SECRET"
                         echo "======================================"
 
                         ECR_PASSWORD=$(aws ecr get-login-password \
                             --region ${AWS_REGION})
 
-                        kubectl create secret docker-registry \
-                            ecr-registry-secret \
+                        kubectl create secret docker-registry ecr-registry-secret \
                             --docker-server=${ECR_REGISTRY} \
                             --docker-username=AWS \
                             --docker-password="${ECR_PASSWORD}" \
-                            --namespace=${K8S_NAMESPACE} \
+                            --namespace=${NAMESPACE} \
                             --dry-run=client \
-                            -o yaml | kubectl apply -f -
+                            -o yaml \
+                        | kubectl apply -f -
 
                         echo ""
-                        echo "ECR pull secret is ready."
-
-                        kubectl get secret \
-                            ecr-registry-secret \
-                            -n ${K8S_NAMESPACE}
+                        echo "ECR pull secret:"
+                        kubectl get secret ecr-registry-secret \
+                            -n ${NAMESPACE}
                     '''
                 }
             }
         }
 
 
-        // =====================================================
-        // 10. HELM TEMPLATE
-        // =====================================================
-
         stage('Helm Template') {
 
             steps {
 
-                sh '''
-                    set -e
+                withCredentials([
+                    file(
+                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
+                        variable: 'KUBECONFIG_FILE'
+                    )
+                ]) {
 
-                    echo "======================================"
-                    echo "RENDERING HELM TEMPLATE"
-                    echo "======================================"
+                    sh '''
+                        set -e
 
-                    helm template ${HELM_RELEASE} \
-                        ${HELM_CHART} \
-                        --namespace ${K8S_NAMESPACE} \
-                        --set image.repository=${ECR_REGISTRY}/${ECR_REPOSITORY} \
-                        --set image.tag=${BUILD_NUMBER} \
-                        --set image.pullPolicy=Always
+                        export KUBECONFIG="${KUBECONFIG_FILE}"
 
-                    echo ""
-                    echo "Helm template rendered successfully."
-                '''
+                        echo "======================================"
+                        echo "HELM TEMPLATE"
+                        echo "======================================"
+
+                        helm template ${HELM_RELEASE} ${HELM_CHART} \
+                            --namespace ${NAMESPACE} \
+                            --set image.repository=${ECR_IMAGE} \
+                            --set image.tag=${IMAGE_TAG}
+                    '''
+                }
             }
         }
 
-
-        // =====================================================
-        // 11. HELM DEPLOYMENT
-        // =====================================================
 
         stage('Deploy with Helm') {
 
             steps {
 
                 withCredentials([
-
                     file(
-                        credentialsId: "${K8S_CREDENTIAL}",
+                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
                         variable: 'KUBECONFIG_FILE'
                     )
-
                 ]) {
 
                     sh '''
@@ -444,59 +410,33 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "DEPLOYING SHOPRUPEE USING HELM"
+                        echo "HELM DEPLOYMENT"
                         echo "======================================"
 
-                        echo ""
-                        echo "Helm Release:"
-                        echo "${HELM_RELEASE}"
+                        helm upgrade --install ${HELM_RELEASE} ${HELM_CHART} \
+                            --namespace ${NAMESPACE} \
+                            --set image.repository=${ECR_IMAGE} \
+                            --set image.tag=${IMAGE_TAG} \
+                            --wait \
+                            --timeout 5m
 
                         echo ""
-                        echo "Helm Chart:"
-                        echo "${HELM_CHART}"
-
-                        echo ""
-                        echo "Docker Image:"
-                        echo "${IMAGE}"
-
-                        echo ""
-
-                        helm upgrade --install ${HELM_RELEASE} \
-                            ${HELM_CHART} \
-                            --namespace ${K8S_NAMESPACE} \
-                            --set image.repository=${ECR_REGISTRY}/${ECR_REPOSITORY} \
-                            --set image.tag=${BUILD_NUMBER} \
-                            --set image.pullPolicy=Always
-
-                        echo ""
-                        echo "======================================"
-                        echo "HELM DEPLOYMENT COMPLETED"
-                        echo "======================================"
-
-                        helm status \
-                            ${HELM_RELEASE} \
-                            --namespace ${K8S_NAMESPACE}
+                        echo "Helm deployment successful."
                     '''
                 }
             }
         }
 
-
-        // =====================================================
-        // 12. ROLLING UPDATE
-        // =====================================================
 
         stage('Rolling Update') {
 
             steps {
 
                 withCredentials([
-
                     file(
-                        credentialsId: "${K8S_CREDENTIAL}",
+                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
                         variable: 'KUBECONFIG_FILE'
                     )
-
                 ]) {
 
                     sh '''
@@ -505,37 +445,28 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "WAITING FOR ROLLOUT"
+                        echo "ROLLING UPDATE"
                         echo "======================================"
 
                         kubectl rollout status \
                             deployment/shoprupee \
-                            -n ${K8S_NAMESPACE} \
-                            --timeout=180s
-
-                        echo ""
-                        echo "Rolling update completed."
+                            -n ${NAMESPACE} \
+                            --timeout=5m
                     '''
                 }
             }
         }
 
 
-        // =====================================================
-        // 13. VERIFY HELM RELEASE
-        // =====================================================
-
         stage('Verify Helm Release') {
 
             steps {
 
                 withCredentials([
-
                     file(
-                        credentialsId: "${K8S_CREDENTIAL}",
+                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
                         variable: 'KUBECONFIG_FILE'
                     )
-
                 ]) {
 
                     sh '''
@@ -548,34 +479,27 @@ pipeline {
                         echo "======================================"
 
                         helm list \
-                            --namespace ${K8S_NAMESPACE}
+                            -n ${NAMESPACE}
 
                         echo ""
-
-                        helm status \
-                            ${HELM_RELEASE} \
-                            --namespace ${K8S_NAMESPACE}
+                        echo "Release status:"
+                        helm status ${HELM_RELEASE} \
+                            -n ${NAMESPACE}
                     '''
                 }
             }
         }
 
-
-        // =====================================================
-        // 14. VERIFY 4 REPLICAS
-        // =====================================================
 
         stage('Verify 4 Replicas') {
 
             steps {
 
                 withCredentials([
-
                     file(
-                        credentialsId: "${K8S_CREDENTIAL}",
+                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
                         variable: 'KUBECONFIG_FILE'
                     )
-
                 ]) {
 
                     sh '''
@@ -584,61 +508,40 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "VERIFYING 4 SHOPRUPEE REPLICAS"
+                        echo "VERIFY 4 REPLICAS"
                         echo "======================================"
 
                         kubectl get deployment shoprupee \
-                            -n ${K8S_NAMESPACE}
-
-                        echo ""
+                            -n ${NAMESPACE}
 
                         READY=$(kubectl get deployment shoprupee \
-                            -n ${K8S_NAMESPACE} \
+                            -n ${NAMESPACE} \
                             -o jsonpath='{.status.readyReplicas}')
 
-                        READY=${READY:-0}
-
+                        echo ""
                         echo "Ready replicas: ${READY}"
-                        echo "Expected replicas: 4"
 
-                        if [ "${READY}" -ne 4 ]; then
-
-                            echo ""
-                            echo "ERROR: Expected 4 Ready replicas."
-                            echo "Current Ready replicas: ${READY}"
-
-                            kubectl get pods \
-                                -n ${K8S_NAMESPACE} \
-                                -l app=shoprupee \
-                                -o wide
-
+                        if [ "${READY}" != "4" ]; then
+                            echo "ERROR: Expected 4 ready replicas."
                             exit 1
-
                         fi
 
-                        echo ""
-                        echo "SUCCESS: All 4 replicas are Ready."
+                        echo "4 replicas are running."
                     '''
                 }
             }
         }
 
-
-        // =====================================================
-        // 15. VERIFY PODS
-        // =====================================================
 
         stage('Verify Pods') {
 
             steps {
 
                 withCredentials([
-
                     file(
-                        credentialsId: "${K8S_CREDENTIAL}",
+                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
                         variable: 'KUBECONFIG_FILE'
                     )
-
                 ]) {
 
                     sh '''
@@ -647,49 +550,43 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "SHOPRUPEE PODS"
+                        echo "VERIFY PODS"
                         echo "======================================"
 
                         kubectl get pods \
-                            -n ${K8S_NAMESPACE} \
-                            -l app=shoprupee \
+                            -n ${NAMESPACE} \
                             -o wide
 
                         echo ""
-                        echo "Pods by worker:"
+                        echo "Checking pod status..."
 
-                        kubectl get pods \
-                            -n ${K8S_NAMESPACE} \
-                            -l app=shoprupee \
-                            -o jsonpath='{range .items[*]}{.spec.nodeName}{"\\n"}{end}' \
-                            | sort \
-                            | uniq -c
+                        NOT_RUNNING=$(kubectl get pods \
+                            -n ${NAMESPACE} \
+                            --no-headers \
+                            | awk '$3 != "Running" {count++} END {print count+0}')
+
+                        if [ "${NOT_RUNNING}" != "0" ]; then
+                            echo "ERROR: Some pods are not Running."
+                            exit 1
+                        fi
 
                         echo ""
-                        echo "Note:"
-                        echo "Kubernetes scheduler decides pod placement."
-                        echo "We removed affinity/topology constraints."
+                        echo "All ShopRupee pods are Running."
                     '''
                 }
             }
         }
 
-
-        // =====================================================
-        // 16. VERIFY SERVICE
-        // =====================================================
 
         stage('Verify Service') {
 
             steps {
 
                 withCredentials([
-
                     file(
-                        credentialsId: "${K8S_CREDENTIAL}",
+                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
                         variable: 'KUBECONFIG_FILE'
                     )
-
                 ]) {
 
                     sh '''
@@ -698,85 +595,47 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "SHOPRUPEE SERVICE"
+                        echo "VERIFY SERVICE"
                         echo "======================================"
 
                         kubectl get service shoprupee \
-                            -n ${K8S_NAMESPACE}
+                            -n ${NAMESPACE}
 
                         echo ""
                         echo "Service details:"
 
-                        kubectl describe service shoprupee \
-                            -n ${K8S_NAMESPACE}
+                        kubectl get service shoprupee \
+                            -n ${NAMESPACE} \
+                            -o wide
 
                         echo ""
-                        echo "Endpoints:"
+                        echo "ShopRupee NodePort:"
+                        kubectl get service shoprupee \
+                            -n ${NAMESPACE} \
+                            -o jsonpath='{.spec.ports[0].nodePort}'
 
-                        kubectl get endpoints \
-                            shoprupee \
-                            -n ${K8S_NAMESPACE}
+                        echo ""
                     '''
                 }
             }
         }
 
 
-        // =====================================================
-        // 17. FINAL VERIFICATION
-        // =====================================================
-
         stage('Final Verification') {
 
             steps {
 
                 withCredentials([
-
                     file(
-                        credentialsId: "${K8S_CREDENTIAL}",
+                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
                         variable: 'KUBECONFIG_FILE'
                     )
-
                 ]) {
 
                     sh '''
                         set -e
 
                         export KUBECONFIG="${KUBECONFIG_FILE}"
-
-                        echo ""
-                        echo "=========================================="
-                        echo "FINAL SHOPRUPEE VERIFICATION"
-                        echo "=========================================="
-
-                        echo ""
-                        echo "===== HELM ====="
-
-                        helm status \
-                            ${HELM_RELEASE} \
-                            -n ${K8S_NAMESPACE}
-
-                        echo ""
-                        echo "===== DEPLOYMENT ====="
-
-                        kubectl get deployment \
-                            shoprupee \
-                            -n ${K8S_NAMESPACE}
-
-                        echo ""
-                        echo "===== PODS ====="
-
-                        kubectl get pods \
-                            -n ${K8S_NAMESPACE} \
-                            -l app=shoprupee \
-                            -o wide
-
-                        echo ""
-                        echo "===== SERVICE ====="
-
-                        kubectl get service \
-                            shoprupee \
-                            -n ${K8S_NAMESPACE}
 
                         echo ""
                         echo "=========================================="
@@ -784,18 +643,41 @@ pipeline {
                         echo "=========================================="
 
                         echo ""
+                        echo "Helm:"
+                        helm list -n ${NAMESPACE}
+
+                        echo ""
+                        echo "Deployment:"
+                        kubectl get deployment \
+                            -n ${NAMESPACE}
+
+                        echo ""
+                        echo "Pods:"
+                        kubectl get pods \
+                            -n ${NAMESPACE} \
+                            -o wide
+
+                        echo ""
+                        echo "Service:"
+                        kubectl get service \
+                            -n ${NAMESPACE}
+
+                        echo ""
+                        echo "Image:"
+                        echo "${ECR_IMAGE}:${IMAGE_TAG}"
+
+                        echo ""
                         echo "Application:"
                         echo "http://13.232.204.142:30081/"
+
+                        echo ""
+                        echo "=========================================="
                     '''
                 }
             }
         }
     }
 
-
-    // =========================================================
-    // POST ACTIONS
-    // =========================================================
 
     post {
 
@@ -806,52 +688,18 @@ pipeline {
  SHOPRUPEE HELM PIPELINE SUCCESS
 ==========================================
 
-GitHub
-   ↓
-Jenkins
-   ↓
-DJWorker3
-   ↓
-Docker Build
-   ↓
-Amazon ECR
-   ↓
-Kubernetes Authentication
-   ↓
-ECR Pull Secret
-   ↓
-Helm Lint
-   ↓
-Helm Template
-   ↓
-Helm Upgrade/Install
-   ↓
-Kubernetes Deployment
-   ↓
-ReplicaSet
-   ↓
-4 ShopRupee Pods
-   ↓
-NodePort 30081
-   ↓
-ShopRupee Website
+Docker image built and pushed.
+Helm chart validated.
+Kubernetes RBAC verified.
+ECR pull secret created.
+Application deployed with Helm.
+Rolling update completed.
+4 replicas verified.
+Service verified.
 
-==========================================
- HELM RELEASE:
- shoprupee
-
- NAMESPACE:
- shoprupee
-
- REPLICAS:
- 4
-
- SERVICE:
- NodePort 30081
 ==========================================
 '''
         }
-
 
         failure {
 
@@ -860,7 +708,7 @@ ShopRupee Website
  SHOPRUPEE HELM PIPELINE FAILED
 ==========================================
 
-Check the failed stage in Console Output.
+Check the FIRST failed stage in Console Output.
 
 Possible areas:
 
