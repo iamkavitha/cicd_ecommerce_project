@@ -24,7 +24,7 @@ pipeline {
 
         HELM_RELEASE = 'shoprupee'
 
-        KUBECONFIG_CREDENTIAL = 'shoprupee-jenkins-kubeconfig'
+        KUBECONFIG_CREDENTIAL = 'shoprupee-kubeconfig'
     }
 
 
