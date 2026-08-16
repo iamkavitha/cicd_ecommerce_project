@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>ShopRupee.com | DevOps CI/CD</title>
+<title>ShopRupee.com | DevOps CI/CD with Helm</title>
 
 <style>
 
@@ -130,6 +130,10 @@ nav a:hover {
 .top-stage-icon {
     font-size: 30px;
     margin-bottom: 6px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .top-stage strong {
@@ -149,6 +153,7 @@ nav a:hover {
 }
 
 @keyframes arrowMove {
+
     0%,100% {
         transform: translateX(0);
         opacity: .5;
@@ -158,6 +163,130 @@ nav a:hover {
         transform: translateX(7px);
         opacity: 1;
     }
+
+}
+
+/* =========================
+   HELM GRAPHICS
+========================= */
+
+.helm-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 7px 12px;
+
+    border-radius: 999px;
+
+    background: rgba(255,255,255,.12);
+
+    border: 1px solid rgba(255,255,255,.25);
+
+    color: white;
+
+    font-weight: 700;
+
+    font-size: 12px;
+}
+
+.helm-logo-svg {
+    width: 28px;
+    height: 28px;
+
+    flex: 0 0 auto;
+}
+
+.helm-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.helm-card::after {
+    content: "HELM";
+
+    position: absolute;
+
+    right: 14px;
+    top: 12px;
+
+    padding: 5px 8px;
+
+    border-radius: 8px;
+
+    background: #0f172a;
+
+    color: white;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+.helm-card .helm-logo-large {
+    width: 72px;
+    height: 72px;
+
+    color: #2563eb;
+
+    margin-bottom: 12px;
+}
+
+.helm-flow-item {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+.helm-flow-item .helm-logo-small {
+    width: 22px;
+    height: 22px;
+}
+
+.helm-release {
+    margin-top: 22px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 14px;
+}
+
+.helm-release-card {
+    background: rgba(255,255,255,.08);
+
+    border: 1px solid #334155;
+
+    border-radius: 14px;
+
+    padding: 18px;
+
+    text-align: center;
+}
+
+.helm-release-card .helm-logo-large {
+    width: 46px;
+    height: 46px;
+
+    color: #60a5fa;
+
+    margin-bottom: 8px;
+}
+
+.helm-release-card strong {
+    display: block;
+
+    margin-bottom: 5px;
+}
+
+.helm-release-card small {
+    color: #94a3b8;
 }
 
 /* =========================
@@ -168,11 +297,13 @@ nav a:hover {
     min-height: 520px;
 
     position: relative;
+
     overflow: hidden;
 
     padding: 90px 8%;
 
     display: flex;
+
     align-items: center;
 
     color: white;
@@ -183,11 +314,13 @@ nav a:hover {
             rgba(96,165,250,.4),
             transparent 25%
         ),
+
         radial-gradient(
             circle at 80% 30%,
             rgba(167,139,250,.4),
             transparent 25%
         ),
+
         linear-gradient(
             135deg,
             #1d4ed8,
@@ -197,23 +330,29 @@ nav a:hover {
 
 .hero-content {
     position: relative;
+
     z-index: 5;
+
     max-width: 720px;
 }
 
 .hero h1 {
     font-size: 52px;
+
     margin-bottom: 15px;
 }
 
 .hero h2 {
     color: #dbeafe;
+
     margin-bottom: 20px;
 }
 
 .hero p {
     font-size: 18px;
+
     line-height: 1.7;
+
     margin-bottom: 25px;
 }
 
@@ -223,11 +362,13 @@ nav a:hover {
     padding: 13px 25px;
 
     background: white;
+
     color: #2563eb;
 
     border-radius: 10px;
 
     text-decoration: none;
+
     font-weight: bold;
 
     transition: .3s;
@@ -235,20 +376,24 @@ nav a:hover {
 
 .button:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.25);
 }
 
 /* =========================
-   HERO GRAPHIC
+   HERO HELM GRAPHIC
 ========================= */
 
 .hero-graphic {
     position: absolute;
 
     right: 8%;
+
     top: 50%;
 
     width: 320px;
+
     height: 320px;
 
     transform: translateY(-50%);
@@ -259,17 +404,21 @@ nav a:hover {
 
     inset: 20px;
 
-    border: 2px solid rgba(255,255,255,.3);
+    border:
+        2px solid
+        rgba(255,255,255,.3);
 
     border-radius: 50%;
 
-    animation: rotate 15s linear infinite;
+    animation:
+        rotate 15s linear infinite;
 }
 
 .orbit:nth-child(2) {
     inset: 70px;
 
     animation-duration: 9s;
+
     animation-direction: reverse;
 }
 
@@ -277,27 +426,32 @@ nav a:hover {
     position: absolute;
 
     width: 14px;
+
     height: 14px;
 
     background: white;
 
     border-radius: 50%;
 
-    box-shadow: 0 0 20px white;
+    box-shadow:
+        0 0 20px white;
 }
 
 .dot1 {
     top: -7px;
+
     left: 50%;
 }
 
 .dot2 {
     right: -7px;
+
     top: 50%;
 }
 
 .dot3 {
     bottom: -7px;
+
     left: 50%;
 }
 
@@ -305,32 +459,51 @@ nav a:hover {
     position: absolute;
 
     top: 50%;
+
     left: 50%;
 
-    transform: translate(-50%,-50%);
+    transform:
+        translate(-50%,-50%);
 
-    width: 110px;
-    height: 110px;
+    width: 125px;
+
+    height: 125px;
 
     border-radius: 25px;
 
-    background: rgba(255,255,255,.12);
+    background:
+        rgba(255,255,255,.12);
 
-    border: 1px solid rgba(255,255,255,.3);
+    border:
+        1px solid
+        rgba(255,255,255,.3);
 
     display: flex;
+
     justify-content: center;
+
     align-items: center;
 
     font-size: 55px;
 
-    backdrop-filter: blur(10px);
+    backdrop-filter:
+        blur(10px);
+
+    text-align: center;
+}
+
+.cloud-icon .helm-logo-svg {
+    width: 55px;
+
+    height: 55px;
 }
 
 @keyframes rotate {
+
     to {
         transform: rotate(360deg);
     }
+
 }
 
 /* =========================
@@ -339,18 +512,23 @@ nav a:hover {
 
 .devops {
     background: white;
+
     padding: 70px 7%;
 }
 
 .section-title {
     text-align: center;
+
     font-size: 36px;
+
     margin-bottom: 12px;
 }
 
 .section-description {
     text-align: center;
+
     color: #64748b;
+
     margin-bottom: 40px;
 }
 
@@ -360,19 +538,26 @@ nav a:hover {
 
 .pipeline {
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     gap: 12px;
+
     flex-wrap: wrap;
 }
 
 .pipeline-node {
     width: 135px;
+
     min-height: 145px;
 
     background: #f8fafc;
 
-    border: 2px solid #2563eb;
+    border:
+        2px solid
+        #2563eb;
 
     border-radius: 16px;
 
@@ -384,31 +569,52 @@ nav a:hover {
 }
 
 .pipeline-node:hover {
-    transform: translateY(-10px) scale(1.04);
+    transform:
+        translateY(-10px)
+        scale(1.04);
 
     box-shadow:
-        0 15px 30px rgba(37,99,235,.2);
+        0 15px 30px
+        rgba(37,99,235,.2);
 }
 
 .node-icon {
     font-size: 40px;
+
     margin-bottom: 10px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+}
+
+.node-icon .helm-logo-svg {
+    width: 40px;
+
+    height: 40px;
 }
 
 .pipeline-node h3 {
     font-size: 16px;
+
     margin-bottom: 7px;
 }
 
 .pipeline-node p {
     color: #64748b;
+
     font-size: 12px;
 }
 
 .pipeline-arrow {
     color: #2563eb;
+
     font-size: 28px;
-    animation: arrowMove 1.5s infinite;
+
+    animation:
+        arrowMove 1.5s infinite;
 }
 
 /* =========================
@@ -431,7 +637,9 @@ nav a:hover {
 .metric {
     background: #f8fafc;
 
-    border: 1px solid #e2e8f0;
+    border:
+        1px solid
+        #e2e8f0;
 
     border-radius: 14px;
 
@@ -443,10 +651,12 @@ nav a:hover {
 }
 
 .metric:hover {
-    transform: translateY(-5px);
+    transform:
+        translateY(-5px);
 
     box-shadow:
-        0 10px 25px rgba(0,0,0,.08);
+        0 10px 25px
+        rgba(0,0,0,.08);
 }
 
 .metric-value {
@@ -474,7 +684,7 @@ nav a:hover {
 ========================= */
 
 .flow-box {
-    max-width: 1000px;
+    max-width: 1100px;
 
     margin: 40px auto;
 
@@ -498,13 +708,15 @@ nav a:hover {
 
     gap: 10px;
 
-    min-width: 800px;
+    min-width: 950px;
 }
 
 .flow-item {
     background: #1e293b;
 
-    border: 1px solid #475569;
+    border:
+        1px solid
+        #475569;
 
     padding: 12px 15px;
 
@@ -517,6 +729,13 @@ nav a:hover {
     color: #60a5fa;
 
     font-size: 20px;
+}
+
+.helm-flow-item {
+    border-color: #60a5fa;
+
+    background:
+        rgba(37,99,235,.18);
 }
 
 /* =========================
@@ -537,7 +756,9 @@ nav a:hover {
             #f5f3ff
         );
 
-    border: 2px solid #bfdbfe;
+    border:
+        2px solid
+        #bfdbfe;
 }
 
 .cluster-title {
@@ -557,12 +778,80 @@ nav a:hover {
 }
 
 .cluster-container {
-    border: 3px dashed #2563eb;
+    border:
+        3px dashed
+        #2563eb;
 
     border-radius: 20px;
 
     padding: 30px;
 }
+
+/* =========================
+   HELM RELEASE GRAPHICS
+========================= */
+
+.helm-release {
+    margin-bottom: 30px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap: 14px;
+}
+
+.helm-release-card {
+    background: #111827;
+
+    color: white;
+
+    border:
+        1px solid
+        #334155;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    text-align: center;
+
+    transition: .3s;
+}
+
+.helm-release-card:hover {
+    transform:
+        translateY(-6px);
+
+    box-shadow:
+        0 12px 25px
+        rgba(37,99,235,.2);
+}
+
+.helm-release-card .helm-logo-large {
+    width: 50px;
+
+    height: 50px;
+
+    color: #60a5fa;
+
+    margin-bottom: 10px;
+}
+
+.helm-release-card strong {
+    display: block;
+
+    margin-bottom: 6px;
+}
+
+.helm-release-card small {
+    color: #94a3b8;
+}
+
+/* =========================
+   PODS
+========================= */
 
 .pods {
     display: grid;
@@ -582,20 +871,25 @@ nav a:hover {
 
     text-align: center;
 
-    border: 2px solid #22c55e;
+    border:
+        2px solid
+        #22c55e;
 
     box-shadow:
-        0 8px 20px rgba(0,0,0,.08);
+        0 8px 20px
+        rgba(0,0,0,.08);
 
     transition: .3s;
 }
 
 .pod:hover {
-    transform: translateY(-8px);
+    transform:
+        translateY(-8px);
 }
 
 .pod-icon {
     font-size: 40px;
+
     margin-bottom: 10px;
 }
 
@@ -637,11 +931,13 @@ nav a:hover {
 
 .rolling h3 {
     font-size: 24px;
+
     margin-bottom: 10px;
 }
 
 .rolling p {
     color: #cbd5e1;
+
     margin-bottom: 25px;
 }
 
@@ -667,37 +963,51 @@ nav a:hover {
 .old-pod {
     background: #374151;
 
-    animation: oldVersion 4s infinite;
+    animation:
+        oldVersion 4s infinite;
 }
 
 .new-pod {
     background: #2563eb;
 
-    animation: newVersion 4s infinite;
+    animation:
+        newVersion 4s infinite;
 }
 
 @keyframes oldVersion {
+
     0%,60% {
         opacity: 1;
-        transform: scale(1);
+
+        transform:
+            scale(1);
     }
 
     75%,100% {
         opacity: .3;
-        transform: scale(.8);
+
+        transform:
+            scale(.8);
     }
+
 }
 
 @keyframes newVersion {
+
     0%,30% {
         opacity: .3;
-        transform: scale(.8);
+
+        transform:
+            scale(.8);
     }
 
     50%,100% {
         opacity: 1;
-        transform: scale(1);
+
+        transform:
+            scale(1);
     }
+
 }
 
 /* =========================
@@ -727,16 +1037,19 @@ nav a:hover {
     text-align: center;
 
     box-shadow:
-        0 5px 20px rgba(0,0,0,.07);
+        0 5px 20px
+        rgba(0,0,0,.07);
 
     transition: .3s;
 }
 
 .card:hover {
-    transform: translateY(-10px);
+    transform:
+        translateY(-10px);
 
     box-shadow:
-        0 20px 40px rgba(0,0,0,.12);
+        0 20px 40px
+        rgba(0,0,0,.12);
 }
 
 .product-image {
@@ -795,7 +1108,8 @@ nav a:hover {
 ========================= */
 
 .architecture {
-    margin: 20px 7% 60px;
+    margin:
+        20px 7% 60px;
 
     padding: 40px;
 
@@ -806,7 +1120,8 @@ nav a:hover {
     text-align: center;
 
     box-shadow:
-        0 5px 20px rgba(0,0,0,.07);
+        0 5px 20px
+        rgba(0,0,0,.07);
 }
 
 .architecture-flow {
@@ -867,6 +1182,7 @@ footer p {
 
     .hero-graphic {
         opacity: .2;
+
         right: 0;
     }
 
@@ -878,22 +1194,26 @@ footer p {
     .top-pipeline-track {
         gap: 8px;
     }
+
 }
 
 @media(max-width:768px) {
 
     header {
         flex-direction: column;
+
         gap: 15px;
     }
 
     nav a {
         margin: 0 7px;
+
         font-size: 13px;
     }
 
     .hero {
-        padding: 70px 7%;
+        padding:
+            70px 7%;
     }
 
     .hero h1 {
@@ -905,12 +1225,18 @@ footer p {
     }
 
     .pipeline-arrow {
-        transform: rotate(90deg);
+        transform:
+            rotate(90deg);
     }
 
     .pods {
         grid-template-columns:
             repeat(2,1fr);
+    }
+
+    .helm-release {
+        grid-template-columns:
+            1fr;
     }
 
     .top-pipeline-track {
@@ -926,8 +1252,12 @@ footer p {
 
     .pipeline-heading {
         flex-direction: column;
+
         align-items: flex-start;
+
+        gap: 12px;
     }
+
 }
 
 @media(max-width:450px) {
@@ -948,9 +1278,15 @@ footer p {
     .hero-graphic {
         display: none;
     }
+
 }
 
+/* =========================
+   HELM SVG
+========================= */
+
 </style>
+
 </head>
 
 <body>
@@ -966,10 +1302,23 @@ footer p {
     </div>
 
     <nav>
-        <a href="#">Home</a>
-        <a href="#products">Products</a>
-        <a href="#devops">DevOps</a>
-        <a href="#cluster">Kubernetes</a>
+
+        <a href="#">
+            Home
+        </a>
+
+        <a href="#products">
+            Products
+        </a>
+
+        <a href="#devops">
+            DevOps
+        </a>
+
+        <a href="#cluster">
+            Kubernetes
+        </a>
+
     </nav>
 
 </header>
@@ -987,8 +1336,55 @@ footer p {
             ⚡ CI/CD DevOps Pipeline
         </h2>
 
-        <div class="pipeline-status">
-            ● PIPELINE HEALTHY • AUTO DEPLOY ON
+        <div style="
+            display:flex;
+            align-items:center;
+            gap:10px;
+            flex-wrap:wrap;
+        ">
+
+            <div class="helm-badge">
+
+                <svg
+                    class="helm-logo-svg"
+                    viewBox="0 0 64 64"
+                    aria-label="Helm"
+                    role="img"
+                >
+
+                    <circle
+                        cx="32"
+                        cy="32"
+                        r="29"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                    />
+
+                    <path
+                        d="M18 44V20h5v19h18v5H18z"
+                        fill="currentColor"
+                    />
+
+                    <path
+                        d="M26 20h5v12h10V20h5v24h-5v-7H31v7h-5V20z"
+                        fill="currentColor"
+                        opacity=".72"
+                    />
+
+                </svg>
+
+                Helm • Chart Deployment
+
+            </div>
+
+
+            <div class="pipeline-status">
+
+                ● PIPELINE HEALTHY • AUTO DEPLOY ON
+
+            </div>
+
         </div>
 
     </div>
@@ -996,50 +1392,196 @@ footer p {
 
     <div class="top-pipeline-track">
 
+
+        <!-- CODE -->
+
         <div class="top-stage">
-            <div class="top-stage-icon">💻</div>
-            <strong>Code</strong>
-            <small>Developer</small>
+
+            <div class="top-stage-icon">
+                💻
+            </div>
+
+            <strong>
+                Code
+            </strong>
+
+            <small>
+                Developer
+            </small>
+
         </div>
 
-        <div class="top-arrow">→</div>
 
-        <div class="top-stage">
-            <div class="top-stage-icon">🐙</div>
-            <strong>GitHub</strong>
-            <small>Push / PR</small>
+        <div class="top-arrow">
+            →
         </div>
 
-        <div class="top-arrow">→</div>
+
+        <!-- GITHUB -->
 
         <div class="top-stage">
-            <div class="top-stage-icon">🔨</div>
-            <strong>Jenkins</strong>
-            <small>Build & Test</small>
+
+            <div class="top-stage-icon">
+                🐙
+            </div>
+
+            <strong>
+                GitHub
+            </strong>
+
+            <small>
+                Push / PR
+            </small>
+
         </div>
 
-        <div class="top-arrow">→</div>
 
-        <div class="top-stage">
-            <div class="top-stage-icon">🐳</div>
-            <strong>Docker</strong>
-            <small>Image Build</small>
+        <div class="top-arrow">
+            →
         </div>
 
-        <div class="top-arrow">→</div>
+
+        <!-- JENKINS -->
 
         <div class="top-stage">
-            <div class="top-stage-icon">📦</div>
-            <strong>Amazon ECR</strong>
-            <small>Image Registry</small>
+
+            <div class="top-stage-icon">
+                🔨
+            </div>
+
+            <strong>
+                Jenkins
+            </strong>
+
+            <small>
+                Build & Test
+            </small>
+
         </div>
 
-        <div class="top-arrow">→</div>
+
+        <div class="top-arrow">
+            →
+        </div>
+
+
+        <!-- DOCKER -->
 
         <div class="top-stage">
-            <div class="top-stage-icon">☸️</div>
-            <strong>Kubernetes</strong>
-            <small>Deployment</small>
+
+            <div class="top-stage-icon">
+                🐳
+            </div>
+
+            <strong>
+                Docker
+            </strong>
+
+            <small>
+                Image Build
+            </small>
+
+        </div>
+
+
+        <div class="top-arrow">
+            →
+        </div>
+
+
+        <!-- ECR -->
+
+        <div class="top-stage">
+
+            <div class="top-stage-icon">
+                📦
+            </div>
+
+            <strong>
+                Amazon ECR
+            </strong>
+
+            <small>
+                Image Registry
+            </small>
+
+        </div>
+
+
+        <div class="top-arrow">
+            →
+        </div>
+
+
+        <!-- HELM -->
+
+        <div class="top-stage helm-card">
+
+            <div class="top-stage-icon">
+
+                <svg
+                    class="helm-logo-svg"
+                    viewBox="0 0 64 64"
+                    aria-label="Helm"
+                    role="img"
+                >
+
+                    <circle
+                        cx="32"
+                        cy="32"
+                        r="29"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                    />
+
+                    <path
+                        d="M18 44V20h5v19h18v5H18z"
+                        fill="currentColor"
+                    />
+
+                    <path
+                        d="M26 20h5v12h10V20h5v24h-5v-7H31v7h-5V20z"
+                        fill="currentColor"
+                        opacity=".72"
+                    />
+
+                </svg>
+
+            </div>
+
+            <strong>
+                Helm
+            </strong>
+
+            <small>
+                Package & Release
+            </small>
+
+        </div>
+
+
+        <div class="top-arrow">
+            →
+        </div>
+
+
+        <!-- KUBERNETES -->
+
+        <div class="top-stage">
+
+            <div class="top-stage-icon">
+                ☸️
+            </div>
+
+            <strong>
+                Kubernetes
+            </strong>
+
+            <small>
+                Deployment
+            </small>
+
         </div>
 
     </div>
@@ -1053,24 +1595,75 @@ footer p {
 
 <section class="hero">
 
+
+    <!-- HERO GRAPHIC -->
+
     <div class="hero-graphic">
+
 
         <div class="orbit">
 
             <span class="orbit-dot dot1"></span>
+
             <span class="orbit-dot dot2"></span>
+
             <span class="orbit-dot dot3"></span>
 
         </div>
 
+
         <div class="orbit"></div>
 
+
         <div class="cloud-icon">
-            ☸️
+
+            <div>
+
+                <svg
+                    class="helm-logo-svg"
+                    viewBox="0 0 64 64"
+                    aria-label="Helm"
+                    role="img"
+                >
+
+                    <circle
+                        cx="32"
+                        cy="32"
+                        r="29"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                    />
+
+                    <path
+                        d="M18 44V20h5v19h18v5H18z"
+                        fill="currentColor"
+                    />
+
+                    <path
+                        d="M26 20h5v12h10V20h5v24h-5v-7H31v7h-5V20z"
+                        fill="currentColor"
+                        opacity=".72"
+                    />
+
+                </svg>
+
+                <div style="
+                    font-size:13px;
+                    margin-top:4px;
+                    font-weight:700;
+                ">
+                    HELM
+                </div>
+
+            </div>
+
         </div>
 
     </div>
 
+
+    <!-- HERO CONTENT -->
 
     <div class="hero-content">
 
@@ -1083,12 +1676,17 @@ footer p {
         </h2>
 
         <p>
+
             A modern e-commerce application powered by
-            Git, GitHub, Jenkins, Docker, Amazon ECR
-            and Kubernetes.
+            Git, GitHub, Jenkins, Docker, Amazon ECR,
+            Helm and Kubernetes.
+
         </p>
 
-        <a href="#products" class="button">
+        <a
+            href="#products"
+            class="button"
+        >
             🛒 Shop Now
         </a>
 
@@ -1101,18 +1699,33 @@ footer p {
      DEVOPS
 ========================= -->
 
-<section class="devops" id="devops">
+<section
+    class="devops"
+    id="devops"
+>
+
 
     <h2 class="section-title">
+
         🚀 CI/CD DevOps Pipeline
+
     </h2>
 
+
     <p class="section-description">
-        From source code to a production-ready Kubernetes deployment.
+
+        From source code to a production-ready
+        Kubernetes deployment using Helm.
+
     </p>
 
 
+    <!-- MAIN PIPELINE -->
+
     <div class="pipeline">
+
+
+        <!-- GIT -->
 
         <div class="pipeline-node">
 
@@ -1120,7 +1733,9 @@ footer p {
                 💻
             </div>
 
-            <h3>Git</h3>
+            <h3>
+                Git
+            </h3>
 
             <p>
                 Version Control
@@ -1129,8 +1744,12 @@ footer p {
         </div>
 
 
-        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-arrow">
+            →
+        </div>
 
+
+        <!-- GITHUB -->
 
         <div class="pipeline-node">
 
@@ -1138,7 +1757,9 @@ footer p {
                 🐙
             </div>
 
-            <h3>GitHub</h3>
+            <h3>
+                GitHub
+            </h3>
 
             <p>
                 Source Repository
@@ -1147,8 +1768,12 @@ footer p {
         </div>
 
 
-        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-arrow">
+            →
+        </div>
 
+
+        <!-- JENKINS -->
 
         <div class="pipeline-node">
 
@@ -1156,7 +1781,9 @@ footer p {
                 🔨
             </div>
 
-            <h3>Jenkins</h3>
+            <h3>
+                Jenkins
+            </h3>
 
             <p>
                 CI/CD Automation
@@ -1165,8 +1792,12 @@ footer p {
         </div>
 
 
-        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-arrow">
+            →
+        </div>
 
+
+        <!-- DOCKER -->
 
         <div class="pipeline-node">
 
@@ -1174,7 +1805,9 @@ footer p {
                 🐳
             </div>
 
-            <h3>Docker</h3>
+            <h3>
+                Docker
+            </h3>
 
             <p>
                 Containerization
@@ -1183,8 +1816,12 @@ footer p {
         </div>
 
 
-        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-arrow">
+            →
+        </div>
 
+
+        <!-- ECR -->
 
         <div class="pipeline-node">
 
@@ -1192,7 +1829,9 @@ footer p {
                 📦
             </div>
 
-            <h3>Amazon ECR</h3>
+            <h3>
+                Amazon ECR
+            </h3>
 
             <p>
                 Image Registry
@@ -1201,8 +1840,65 @@ footer p {
         </div>
 
 
-        <div class="pipeline-arrow">→</div>
+        <div class="pipeline-arrow">
+            →
+        </div>
 
+
+        <!-- HELM -->
+
+        <div class="pipeline-node helm-card">
+
+            <div class="node-icon">
+
+                <svg
+                    class="helm-logo-svg"
+                    viewBox="0 0 64 64"
+                    aria-label="Helm"
+                    role="img"
+                >
+
+                    <circle
+                        cx="32"
+                        cy="32"
+                        r="29"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                    />
+
+                    <path
+                        d="M18 44V20h5v19h18v5H18z"
+                        fill="currentColor"
+                    />
+
+                    <path
+                        d="M26 20h5v12h10V20h5v24h-5v-7H31v7h-5V20z"
+                        fill="currentColor"
+                        opacity=".72"
+                    />
+
+                </svg>
+
+            </div>
+
+            <h3>
+                Helm
+            </h3>
+
+            <p>
+                Package & Release Management
+            </p>
+
+        </div>
+
+
+        <div class="pipeline-arrow">
+            →
+        </div>
+
+
+        <!-- KUBERNETES -->
 
         <div class="pipeline-node">
 
@@ -1210,7 +1906,9 @@ footer p {
                 ☸️
             </div>
 
-            <h3>Kubernetes</h3>
+            <h3>
+                Kubernetes
+            </h3>
 
             <p>
                 Container Orchestration
@@ -1221,74 +1919,177 @@ footer p {
     </div>
 
 
-    <!-- METRICS -->
+    <!-- =========================
+         METRICS
+    ========================== -->
 
     <div class="metrics">
 
-        <div class="metric">
-            <span class="metric-value">6</span>
-            <span class="metric-label">Core DevOps Tools</span>
-        </div>
 
         <div class="metric">
-            <span class="metric-value">4</span>
-            <span class="metric-label">Kubernetes Replicas</span>
+
+            <span class="metric-value">
+                7
+            </span>
+
+            <span class="metric-label">
+                Core DevOps Tools
+            </span>
+
         </div>
 
-        <div class="metric">
-            <span class="metric-value">100%</span>
-            <span class="metric-label">Containerized</span>
-        </div>
 
         <div class="metric">
-            <span class="metric-value">∞</span>
-            <span class="metric-label">Repeatable Deployments</span>
+
+            <span class="metric-value">
+                4
+            </span>
+
+            <span class="metric-label">
+                Kubernetes Replicas
+            </span>
+
+        </div>
+
+
+        <div class="metric">
+
+            <span class="metric-value">
+                100%
+            </span>
+
+            <span class="metric-label">
+                Containerized
+            </span>
+
+        </div>
+
+
+        <div class="metric">
+
+            <span class="metric-value">
+                ∞
+            </span>
+
+            <span class="metric-label">
+                Repeatable Deployments
+            </span>
+
         </div>
 
     </div>
 
 
-    <!-- FLOW GRAPHIC -->
+    <!-- =========================
+         FLOW GRAPHIC
+    ========================== -->
 
     <div class="flow-box">
 
         <div class="flow">
 
+
             <div class="flow-item">
                 🧑‍💻 Developer
             </div>
 
-            <div class="flow-arrow">→</div>
+
+            <div class="flow-arrow">
+                →
+            </div>
+
 
             <div class="flow-item">
                 🐙 GitHub
             </div>
 
-            <div class="flow-arrow">→</div>
+
+            <div class="flow-arrow">
+                →
+            </div>
+
 
             <div class="flow-item">
                 🔨 Jenkins
             </div>
 
-            <div class="flow-arrow">→</div>
+
+            <div class="flow-arrow">
+                →
+            </div>
+
 
             <div class="flow-item">
                 🐳 Docker
             </div>
 
-            <div class="flow-arrow">→</div>
+
+            <div class="flow-arrow">
+                →
+            </div>
+
 
             <div class="flow-item">
                 📦 ECR
             </div>
 
-            <div class="flow-arrow">→</div>
+
+            <div class="flow-arrow">
+                →
+            </div>
+
+
+            <div class="flow-item helm-flow-item">
+
+
+                <svg
+                    class="helm-logo-small"
+                    viewBox="0 0 64 64"
+                    aria-label="Helm"
+                    role="img"
+                >
+
+                    <circle
+                        cx="32"
+                        cy="32"
+                        r="29"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                    />
+
+                    <path
+                        d="M18 44V20h5v19h18v5H18z"
+                        fill="currentColor"
+                    />
+
+                    <path
+                        d="M26 20h5v12h10V20h5v24h-5v-7H31v7h-5V20z"
+                        fill="currentColor"
+                        opacity=".72"
+                    />
+
+                </svg>
+
+                Helm
+
+            </div>
+
+
+            <div class="flow-arrow">
+                →
+            </div>
+
 
             <div class="flow-item">
                 ☸️ Kubernetes
             </div>
 
-            <div class="flow-arrow">→</div>
+
+            <div class="flow-arrow">
+                →
+            </div>
+
 
             <div class="flow-item">
                 🚀 Production
@@ -1303,20 +2104,177 @@ footer p {
          KUBERNETES
     ========================== -->
 
-    <div class="cluster" id="cluster">
+    <div
+        class="cluster"
+        id="cluster"
+    >
+
 
         <h2 class="cluster-title">
+
             ☸️ Kubernetes Cluster
+
         </h2>
 
+
         <p class="cluster-subtitle">
-            Application deployed with 4 replicas
+
+            Application deployed using
+            Helm with 4 Kubernetes replicas
+
         </p>
 
 
         <div class="cluster-container">
 
+
+            <!-- =========================
+                 HELM RELEASE GRAPHICS
+            ========================== -->
+
+            <div class="helm-release">
+
+
+                <!-- HELM CHART -->
+
+                <div class="helm-release-card">
+
+                    <svg
+                        class="helm-logo-large"
+                        viewBox="0 0 64 64"
+                        aria-label="Helm"
+                        role="img"
+                    >
+
+                        <circle
+                            cx="32"
+                            cy="32"
+                            r="29"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="3"
+                        />
+
+                        <path
+                            d="M18 44V20h5v19h18v5H18z"
+                            fill="currentColor"
+                        />
+
+                        <path
+                            d="M26 20h5v12h10V20h5v24h-5v-7H31v7h-5V20z"
+                            fill="currentColor"
+                            opacity=".72"
+                        />
+
+                    </svg>
+
+                    <strong>
+                        Helm Chart
+                    </strong>
+
+                    <small>
+                        shoprupee-chart
+                    </small>
+
+                </div>
+
+
+                <!-- HELM RELEASE -->
+
+                <div class="helm-release-card">
+
+                    <svg
+                        class="helm-logo-large"
+                        viewBox="0 0 64 64"
+                        aria-label="Helm"
+                        role="img"
+                    >
+
+                        <circle
+                            cx="32"
+                            cy="32"
+                            r="29"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="3"
+                        />
+
+                        <path
+                            d="M18 44V20h5v19h18v5H18z"
+                            fill="currentColor"
+                        />
+
+                        <path
+                            d="M26 20h5v12h10V20h5v24h-5v-7H31v7h-5V20z"
+                            fill="currentColor"
+                            opacity=".72"
+                        />
+
+                    </svg>
+
+                    <strong>
+                        Helm Release
+                    </strong>
+
+                    <small>
+                        shoprupee-prod
+                    </small>
+
+                </div>
+
+
+                <!-- VALUES -->
+
+                <div class="helm-release-card">
+
+                    <svg
+                        class="helm-logo-large"
+                        viewBox="0 0 64 64"
+                        aria-label="Helm"
+                        role="img"
+                    >
+
+                        <circle
+                            cx="32"
+                            cy="32"
+                            r="29"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="3"
+                        />
+
+                        <path
+                            d="M18 44V20h5v19h18v5H18z"
+                            fill="currentColor"
+                        />
+
+                        <path
+                            d="M26 20h5v12h10V20h5v24h-5v-7H31v7h-5V20z"
+                            fill="currentColor"
+                            opacity=".72"
+                        />
+
+                    </svg>
+
+                    <strong>
+                        Helm Values
+                    </strong>
+
+                    <small>
+                        4 replicas • production
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 KUBERNETES PODS
+            ========================== -->
+
             <div class="pods">
+
 
                 <div class="pod">
 
@@ -1396,28 +2354,39 @@ footer p {
             </div>
 
 
-            <!-- ROLLING UPDATE -->
+            <!-- =========================
+                 ROLLING UPDATE
+            ========================== -->
 
             <div class="rolling">
 
+
                 <h3>
-                    🔄 Kubernetes Rolling Update
+                    🔄 Helm + Kubernetes Rolling Update
                 </h3>
 
+
                 <p>
-                    New versions are deployed gradually while
-                    existing replicas continue serving traffic.
+
+                    Helm manages the application release while
+                    Kubernetes gradually replaces old pods with
+                    the new version.
+
                 </p>
 
+
                 <div class="update-animation">
+
 
                     <div class="old-pod">
                         OLD VERSION
                     </div>
 
+
                     <div>
                         →
                     </div>
+
 
                     <div class="new-pod">
                         NEW VERSION
@@ -1438,18 +2407,30 @@ footer p {
      PRODUCTS
 ========================= -->
 
-<section class="products" id="products">
+<section
+    class="products"
+    id="products"
+>
+
 
     <h2 class="section-title">
+
         🛒 Featured Products
+
     </h2>
 
+
     <p class="section-description">
+
         ShopRupee e-commerce application
+
     </p>
 
 
     <div class="product-grid">
+
+
+        <!-- PHONE -->
 
         <div class="card">
 
@@ -1469,12 +2450,17 @@ footer p {
                 ₹24,999
             </div>
 
-            <a href="#" class="buy">
+            <a
+                href="#"
+                class="buy"
+            >
                 Buy Now
             </a>
 
         </div>
 
+
+        <!-- LAPTOP -->
 
         <div class="card">
 
@@ -1494,12 +2480,17 @@ footer p {
                 ₹54,999
             </div>
 
-            <a href="#" class="buy">
+            <a
+                href="#"
+                class="buy"
+            >
                 Buy Now
             </a>
 
         </div>
 
+
+        <!-- HEADPHONES -->
 
         <div class="card">
 
@@ -1519,12 +2510,17 @@ footer p {
                 ₹2,999
             </div>
 
-            <a href="#" class="buy">
+            <a
+                href="#"
+                class="buy"
+            >
                 Buy Now
             </a>
 
         </div>
 
+
+        <!-- WATCH -->
 
         <div class="card">
 
@@ -1544,7 +2540,10 @@ footer p {
                 ₹4,999
             </div>
 
-            <a href="#" class="buy">
+            <a
+                href="#"
+                class="buy"
+            >
                 Buy Now
             </a>
 
@@ -1561,9 +2560,13 @@ footer p {
 
 <div class="architecture">
 
+
     <h2>
+
         🏗️ Complete Deployment Architecture
+
     </h2>
+
 
     <div class="architecture-flow">
 
@@ -1579,11 +2582,14 @@ footer p {
         →
         Amazon ECR
         →
+        Helm
+        →
         Kubernetes
         →
         4 Replicas
 
     </div>
+
 
     <div class="badge">
 
@@ -1592,6 +2598,8 @@ footer p {
         ✅ Docker
         &nbsp; | &nbsp;
         ✅ Amazon ECR
+        &nbsp; | &nbsp;
+        ✅ Helm
         &nbsp; | &nbsp;
         ✅ Kubernetes
         &nbsp; | &nbsp;
@@ -1608,16 +2616,24 @@ footer p {
 
 <footer>
 
+
     <p>
         © 2026 ShopRupee
     </p>
 
+
     <p class="footer-tech">
-        Git • GitHub • Jenkins • Docker • Amazon ECR • Kubernetes
+
+        Git • GitHub • Jenkins • Docker •
+        Amazon ECR • Helm • Kubernetes
+
     </p>
 
+
     <p>
+
         🚀 Cloud-Native DevOps Application
+
     </p>
 
 </footer>
