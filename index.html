@@ -4,28 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ShopRupee.com - Online Shopping</title>
+    <title>ShopRupee | Cloud Native DevOps</title>
 
     <style>
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f7fb;
-            color: #222;
+        html {
+            scroll-behavior: smooth;
         }
 
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #111827;
+            overflow-x: hidden;
+        }
+
+        /* =========================
+           HEADER
+        ========================== */
+
         header {
-            background: #111827;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+
             color: white;
             padding: 18px 8%;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
+
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
         }
 
         .logo {
@@ -33,205 +52,1519 @@
             font-weight: bold;
         }
 
+        .logo span {
+            color: #60a5fa;
+        }
+
         nav a {
             color: white;
             text-decoration: none;
             margin-left: 25px;
+            transition: 0.3s;
         }
 
+        nav a:hover {
+            color: #60a5fa;
+        }
+
+
+        /* =========================
+           HERO
+        ========================== */
+
         .hero {
-            padding: 70px 8%;
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            min-height: 600px;
+
+            position: relative;
+            overflow: hidden;
+
+            padding: 100px 8%;
+
             color: white;
+
+            background:
+                radial-gradient(circle at 20% 20%, rgba(96,165,250,0.4), transparent 25%),
+                radial-gradient(circle at 80% 30%, rgba(167,139,250,0.4), transparent 25%),
+                linear-gradient(135deg, #1d4ed8, #6d28d9);
+
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 5;
+            max-width: 750px;
+
+            animation: heroEnter 1s ease;
+        }
+
+        @keyframes heroEnter {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .hero h1 {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 52px;
+            margin-bottom: 20px;
+        }
+
+        .hero h2 {
+            font-size: 24px;
+            color: #dbeafe;
+            margin-bottom: 20px;
         }
 
         .hero p {
-            font-size: 20px;
-            max-width: 650px;
-            margin-bottom: 25px;
+            font-size: 19px;
+            line-height: 1.7;
+            margin-bottom: 30px;
         }
 
         .button {
             display: inline-block;
-            padding: 13px 25px;
+
+            padding: 14px 28px;
+
             background: white;
             color: #2563eb;
+
+            border-radius: 10px;
+
             text-decoration: none;
-            border-radius: 8px;
+            font-weight: bold;
+
+            transition: 0.3s;
+        }
+
+        .button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+
+
+        /* =========================
+           FLOATING PARTICLES
+        ========================== */
+
+        .particle {
+            position: absolute;
+
+            width: 8px;
+            height: 8px;
+
+            background: rgba(255,255,255,0.7);
+
+            border-radius: 50%;
+
+            animation: floatParticle linear infinite;
+        }
+
+        .p1 {
+            left: 10%;
+            animation-duration: 12s;
+        }
+
+        .p2 {
+            left: 25%;
+            animation-duration: 15s;
+        }
+
+        .p3 {
+            left: 50%;
+            animation-duration: 11s;
+        }
+
+        .p4 {
+            left: 70%;
+            animation-duration: 17s;
+        }
+
+        .p5 {
+            left: 90%;
+            animation-duration: 13s;
+        }
+
+        @keyframes floatParticle {
+
+            0% {
+                bottom: -20px;
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            100% {
+                bottom: 110%;
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+
+
+        /* =========================
+           LIVE STATUS
+        ========================== */
+
+        .live-status {
+            margin-top: 30px;
+
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 10px 18px;
+
+            background: rgba(0,0,0,0.25);
+
+            border-radius: 30px;
+
+            font-size: 14px;
+        }
+
+        .live-dot {
+            width: 11px;
+            height: 11px;
+
+            background: #22c55e;
+
+            border-radius: 50%;
+
+            box-shadow: 0 0 0 rgba(34,197,94,0.7);
+
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0% {
+                box-shadow: 0 0 0 0 rgba(34,197,94,0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 12px rgba(34,197,94,0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(34,197,94,0);
+            }
+        }
+
+
+        /* =========================
+           DEVOPS PIPELINE
+        ========================== */
+
+        .devops {
+            padding: 80px 8%;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .section-description {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 50px;
+            font-size: 17px;
+        }
+
+        .pipeline {
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+        }
+
+        .pipeline-node {
+
+            width: 140px;
+            min-height: 150px;
+
+            padding: 20px 10px;
+
+            background: #f8fafc;
+
+            border: 2px solid #2563eb;
+
+            border-radius: 16px;
+
+            text-align: center;
+
+            position: relative;
+
+            transition: 0.4s;
+
+            animation: nodeAppear 0.8s ease backwards;
+        }
+
+        .pipeline-node:hover {
+
+            transform: translateY(-12px) scale(1.05);
+
+            box-shadow:
+                0 15px 30px rgba(37,99,235,0.2);
+        }
+
+        .pipeline-node:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .pipeline-node:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .pipeline-node:nth-child(5) {
+            animation-delay: 0.3s;
+        }
+
+        .pipeline-node:nth-child(7) {
+            animation-delay: 0.4s;
+        }
+
+        .pipeline-node:nth-child(9) {
+            animation-delay: 0.5s;
+        }
+
+        .pipeline-node:nth-child(11) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes nodeAppear {
+
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .node-icon {
+            font-size: 42px;
+            margin-bottom: 10px;
+
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+
+            0%,100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        .pipeline-node h3 {
+            font-size: 17px;
+            margin-bottom: 7px;
+        }
+
+        .pipeline-node p {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+
+        /* =========================
+           ANIMATED ARROWS
+        ========================== */
+
+        .pipeline-arrow {
+
+            font-size: 30px;
+
+            color: #2563eb;
+
+            position: relative;
+
+            animation: arrowMove 1.5s ease-in-out infinite;
+        }
+
+        @keyframes arrowMove {
+
+            0%,100% {
+                transform: translateX(0);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: translateX(8px);
+                opacity: 1;
+            }
+        }
+
+
+        /* =========================
+           DATA FLOW
+        ========================== */
+
+        .data-flow {
+
+            margin: 45px auto 0;
+
+            max-width: 900px;
+
+            height: 5px;
+
+            background: #dbeafe;
+
+            border-radius: 10px;
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+        .data-flow::before {
+
+            content: "";
+
+            position: absolute;
+
+            width: 150px;
+            height: 100%;
+
+            background: linear-gradient(
+                90deg,
+                transparent,
+                #2563eb,
+                transparent
+            );
+
+            animation: dataFlow 2s linear infinite;
+        }
+
+        @keyframes dataFlow {
+
+            from {
+                left: -150px;
+            }
+
+            to {
+                left: 100%;
+            }
+        }
+
+
+        /* =========================
+           KUBERNETES CLUSTER
+        ========================== */
+
+        .cluster {
+
+            margin-top: 70px;
+
+            padding: 40px;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eff6ff,
+                    #f5f3ff
+                );
+
+            border: 2px solid #bfdbfe;
+        }
+
+        .cluster-title {
+
+            text-align: center;
+
+            font-size: 28px;
+
+            margin-bottom: 10px;
+        }
+
+        .cluster-subtitle {
+
+            text-align: center;
+
+            color: #6b7280;
+
+            margin-bottom: 35px;
+        }
+
+        .cluster-container {
+
+            border: 3px dashed #2563eb;
+
+            border-radius: 20px;
+
+            padding: 30px;
+
+            position: relative;
+        }
+
+        .cluster-label {
+
+            position: absolute;
+
+            top: -16px;
+            left: 30px;
+
+            padding: 7px 18px;
+
+            background: #2563eb;
+
+            color: white;
+
+            border-radius: 20px;
+
+            font-weight: bold;
+
+            font-size: 14px;
+        }
+
+        .pods {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 20px;
+        }
+
+        .pod {
+
+            background: white;
+
+            border-radius: 15px;
+
+            padding: 25px 15px;
+
+            text-align: center;
+
+            border: 2px solid #22c55e;
+
+            box-shadow:
+                0 8px 20px rgba(0,0,0,0.08);
+
+            animation: podPulse 2s infinite;
+        }
+
+        .pod:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .pod:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        .pod:nth-child(4) {
+            animation-delay: 0.9s;
+        }
+
+        @keyframes podPulse {
+
+            0%,100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.04);
+            }
+        }
+
+        .pod-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .pod-status {
+            display: inline-block;
+
+            margin-top: 10px;
+
+            padding: 5px 12px;
+
+            border-radius: 20px;
+
+            background: #dcfce7;
+
+            color: #166534;
+
+            font-size: 12px;
+
             font-weight: bold;
         }
 
-        .products {
-            padding: 50px 8%;
+
+        /* =========================
+           ROLLING UPDATE
+        ========================== */
+
+        .rolling {
+
+            margin-top: 40px;
+
+            background: #111827;
+
+            color: white;
+
+            padding: 30px;
+
+            border-radius: 16px;
+
+            text-align: center;
         }
 
-        .products h2 {
-            text-align: center;
-            margin-bottom: 35px;
-            font-size: 32px;
+        .rolling h3 {
+
+            font-size: 24px;
+
+            margin-bottom: 10px;
+        }
+
+        .rolling p {
+
+            color: #d1d5db;
+
+            margin-bottom: 25px;
+        }
+
+        .update-animation {
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 20px;
+
+            flex-wrap: wrap;
+        }
+
+        .old-pod,
+        .new-pod {
+
+            padding: 15px 25px;
+
+            border-radius: 10px;
+
+            font-weight: bold;
+        }
+
+        .old-pod {
+
+            background: #374151;
+
+            animation: oldPod 4s infinite;
+        }
+
+        .new-pod {
+
+            background: #2563eb;
+
+            animation: newPod 4s infinite;
+        }
+
+        @keyframes oldPod {
+
+            0%,60% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            75%,100% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+        }
+
+        @keyframes newPod {
+
+            0%,30% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+
+            50%,100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+
+        /* =========================
+           PRODUCTS
+        ========================== */
+
+        .products {
+
+            padding: 80px 8%;
         }
 
         .product-grid {
+
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+
             gap: 25px;
         }
 
         .card {
+
             background: white;
+
             padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+
+            border-radius: 16px;
+
             text-align: center;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.07);
+
+            transition: 0.4s;
+        }
+
+        .card:hover {
+
+            transform: translateY(-12px);
+
+            box-shadow:
+                0 20px 40px rgba(0,0,0,0.12);
         }
 
         .product-image {
-            height: 140px;
-            background: #e5e7eb;
-            border-radius: 10px;
+
+            height: 150px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #e0e7ff,
+                    #ede9fe
+                );
+
+            border-radius: 12px;
+
             display: flex;
+
             align-items: center;
             justify-content: center;
-            font-size: 50px;
+
+            font-size: 60px;
+
             margin-bottom: 20px;
+
+            transition: 0.4s;
+        }
+
+        .card:hover .product-image {
+
+            transform: rotate(-3deg) scale(1.05);
         }
 
         .card h3 {
+
             margin-bottom: 10px;
         }
 
+        .card p {
+
+            color: #6b7280;
+
+            line-height: 1.5;
+        }
+
         .price {
+
             font-size: 22px;
+
             font-weight: bold;
+
             color: #2563eb;
-            margin: 12px 0;
+
+            margin: 15px 0;
         }
 
         .buy {
+
             display: inline-block;
+
             background: #2563eb;
+
             color: white;
-            padding: 10px 18px;
-            border-radius: 7px;
+
+            padding: 10px 20px;
+
+            border-radius: 8px;
+
             text-decoration: none;
+
+            transition: 0.3s;
         }
+
+        .buy:hover {
+
+            background: #1d4ed8;
+
+            transform: scale(1.05);
+        }
+
+
+        /* =========================
+           ARCHITECTURE
+        ========================== */
 
         .architecture {
-            margin: 30px 8%;
-            padding: 30px;
+
+            margin: 20px 8% 60px;
+
+            padding: 40px;
+
             background: white;
-            border-radius: 12px;
+
+            border-radius: 18px;
+
             text-align: center;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.07);
         }
+
+        .architecture h2 {
+
+            margin-bottom: 20px;
+        }
+
+        .architecture-flow {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            color: #2563eb;
+
+            line-height: 2;
+        }
+
+        .badge {
+
+            display: inline-block;
+
+            margin-top: 20px;
+
+            padding: 12px 20px;
+
+            background: #dcfce7;
+
+            color: #166534;
+
+            border-radius: 25px;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================== */
 
         footer {
-            margin-top: 40px;
+
             background: #111827;
+
             color: white;
-            padding: 25px;
+
+            padding: 35px;
+
             text-align: center;
         }
 
-        .status {
-            margin-top: 20px;
-            font-size: 14px;
-            opacity: 0.9;
+        footer p {
+
+            margin: 8px;
         }
+
+        .footer-tech {
+
+            color: #60a5fa;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================== */
+
+        @media(max-width: 768px) {
+
+            header {
+
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+            nav a {
+
+                margin: 0 6px;
+
+                font-size: 13px;
+            }
+
+            .hero {
+
+                padding: 70px 7%;
+            }
+
+            .hero h1 {
+
+                font-size: 36px;
+            }
+
+            .hero h2 {
+
+                font-size: 19px;
+            }
+
+            .pipeline {
+
+                flex-direction: column;
+            }
+
+            .pipeline-arrow {
+
+                transform: rotate(90deg);
+            }
+
+            .pods {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .architecture-flow {
+
+                font-size: 14px;
+            }
+        }
+
+        @media(max-width: 450px) {
+
+            .pods {
+
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+
+                font-size: 30px;
+            }
+        }
+
     </style>
 </head>
 
+
 <body>
 
+
+<!-- =========================
+     HEADER
+========================== -->
+
 <header>
-    <div class="logo">ShopRupee</div>
+
+    <div class="logo">
+        Shop<span>Rupee</span>
+    </div>
 
     <nav>
+
         <a href="#">Home</a>
-        <a href="#">Products</a>
-        <a href="#">Offers</a>
-        <a href="#">Cart 🛒</a>
+
+        <a href="#products">
+            Products
+        </a>
+
+        <a href="#devops">
+            DevOps
+        </a>
+
+        <a href="#cluster">
+            Kubernetes
+        </a>
+
     </nav>
+
 </header>
 
+
+<!-- =========================
+     HERO
+========================== -->
+
 <section class="hero">
-    <h1>Shop Smart.Shop More. ShopRupee.com</h1>
-    <h2>GIT-GITHUB-JENKINS-ECR-K8(4 REPLICAS)-ROLLINGUPDATE<h2>
-    <p>
-        Discover great products, exciting offers and a simple
-        shopping experience powered by a modern cloud-native platform.
+
+    <!-- Animated particles -->
+
+    <div class="particle p1"></div>
+    <div class="particle p2"></div>
+    <div class="particle p3"></div>
+    <div class="particle p4"></div>
+    <div class="particle p5"></div>
+
+
+    <div class="hero-content">
+
+        <h1>
+            Shop Smart. Shop More.
+        </h1>
+
+        <h2>
+            ShopRupee Cloud-Native E-Commerce
+        </h2>
+
+        <p>
+
+            A modern e-commerce application built using
+            Git, GitHub, Jenkins, Docker, Amazon ECR and
+            Kubernetes.
+
+            The application runs with 4 Kubernetes replicas
+            and uses Rolling Update deployment.
+
+        </p>
+
+        <a href="#products" class="button">
+            🛒 Shop Now
+        </a>
+
+
+        <div class="live-status">
+
+            <span class="live-dot"></span>
+
+            LIVE APPLICATION • KUBERNETES •
+            4 REPLICAS • ROLLING UPDATE
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     DEVOPS PIPELINE
+========================== -->
+
+<section class="devops" id="devops">
+
+    <h2 class="section-title">
+        🚀 CI/CD DevOps Pipeline
+    </h2>
+
+    <p class="section-description">
+
+        From source code to a production-ready
+        Kubernetes deployment.
+
     </p>
 
-    <a href="#products" class="button">Shop Now</a>
 
-    <div class="status">
-        Application: ShopRupee | Platform: Kubernetes
+    <div class="pipeline">
+
+
+        <div class="pipeline-node">
+
+            <div class="node-icon">
+                💻
+            </div>
+
+            <h3>Git</h3>
+
+            <p>
+                Version Control
+            </p>
+
+        </div>
+
+
+        <div class="pipeline-arrow">
+            →
+        </div>
+
+
+        <div class="pipeline-node">
+
+            <div class="node-icon">
+                🐙
+            </div>
+
+            <h3>GitHub</h3>
+
+            <p>
+                Source Repository
+            </p>
+
+        </div>
+
+
+        <div class="pipeline-arrow">
+            →
+        </div>
+
+
+        <div class="pipeline-node">
+
+            <div class="node-icon">
+                🔨
+            </div>
+
+            <h3>Jenkins</h3>
+
+            <p>
+                CI/CD Automation
+            </p>
+
+        </div>
+
+
+        <div class="pipeline-arrow">
+            →
+        </div>
+
+
+        <div class="pipeline-node">
+
+            <div class="node-icon">
+                🐳
+            </div>
+
+            <h3>Docker</h3>
+
+            <p>
+                Containerization
+            </p>
+
+        </div>
+
+
+        <div class="pipeline-arrow">
+            →
+        </div>
+
+
+        <div class="pipeline-node">
+
+            <div class="node-icon">
+                📦
+            </div>
+
+            <h3>Amazon ECR</h3>
+
+            <p>
+                Image Registry
+            </p>
+
+        </div>
+
+
+        <div class="pipeline-arrow">
+            →
+        </div>
+
+
+        <div class="pipeline-node">
+
+            <div class="node-icon">
+                ☸️
+            </div>
+
+            <h3>Kubernetes</h3>
+
+            <p>
+                Container Orchestration
+            </p>
+
+        </div>
+
     </div>
+
+
+    <div class="data-flow"></div>
+
+
+    <!-- =========================
+         KUBERNETES
+    ========================== -->
+
+    <div class="cluster" id="cluster">
+
+        <h2 class="cluster-title">
+
+            ☸️ Kubernetes Cluster
+
+        </h2>
+
+        <p class="cluster-subtitle">
+
+            Application deployed with 4 replicas
+
+        </p>
+
+
+        <div class="cluster-container">
+
+            <div class="cluster-label">
+
+                Kubernetes Deployment
+
+            </div>
+
+
+            <div class="pods">
+
+
+                <div class="pod">
+
+                    <div class="pod-icon">
+                        📦
+                    </div>
+
+                    <strong>
+                        ShopRupee Pod 1
+                    </strong>
+
+                    <br>
+
+                    <span class="pod-status">
+                        ● RUNNING
+                    </span>
+
+                </div>
+
+
+                <div class="pod">
+
+                    <div class="pod-icon">
+                        📦
+                    </div>
+
+                    <strong>
+                        ShopRupee Pod 2
+                    </strong>
+
+                    <br>
+
+                    <span class="pod-status">
+                        ● RUNNING
+                    </span>
+
+                </div>
+
+
+                <div class="pod">
+
+                    <div class="pod-icon">
+                        📦
+                    </div>
+
+                    <strong>
+                        ShopRupee Pod 3
+                    </strong>
+
+                    <br>
+
+                    <span class="pod-status">
+                        ● RUNNING
+                    </span>
+
+                </div>
+
+
+                <div class="pod">
+
+                    <div class="pod-icon">
+                        📦
+                    </div>
+
+                    <strong>
+                        ShopRupee Pod 4
+                    </strong>
+
+                    <br>
+
+                    <span class="pod-status">
+                        ● RUNNING
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Rolling Update -->
+
+        <div class="rolling">
+
+            <h3>
+                🔄 Kubernetes Rolling Update
+            </h3>
+
+            <p>
+
+                New application versions are deployed gradually
+                while existing replicas continue serving traffic.
+
+            </p>
+
+
+            <div class="update-animation">
+
+                <div class="old-pod">
+                    OLD VERSION
+                </div>
+
+                <div>
+                    →
+                </div>
+
+                <div class="new-pod">
+                    NEW VERSION
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </section>
+
+
+<!-- =========================
+     PRODUCTS
+========================== -->
 
 <section class="products" id="products">
 
-    <h2>Featured Products</h2>
+    <h2 class="section-title">
+        🛒 Featured Products
+    </h2>
+
+    <p class="section-description">
+        ShopRupee e-commerce application
+    </p>
+
 
     <div class="product-grid">
 
-        <div class="card">
-            <div class="product-image">📱</div>
-            <h3>Smart Phone</h3>
-            <p>Latest generation smartphone.</p>
-            <div class="price">₹24,999</div>
-            <a href="#" class="buy">Buy Now</a>
-        </div>
 
         <div class="card">
-            <div class="product-image">💻</div>
-            <h3>Laptop</h3>
-            <p>Powerful laptop for work and entertainment.</p>
-            <div class="price">₹54,999</div>
-            <a href="#" class="buy">Buy Now</a>
+
+            <div class="product-image">
+                📱
+            </div>
+
+            <h3>
+                Smart Phone
+            </h3>
+
+            <p>
+                Latest generation smartphone.
+            </p>
+
+            <div class="price">
+                ₹24,999
+            </div>
+
+            <a href="#" class="buy">
+                Buy Now
+            </a>
+
         </div>
 
-        <div class="card">
-            <div class="product-image">🎧</div>
-            <h3>Wireless Headphones</h3>
-            <p>High-quality wireless audio experience.</p>
-            <div class="price">₹2,999</div>
-            <a href="#" class="buy">Buy Now</a>
-        </div>
 
         <div class="card">
-            <div class="product-image">⌚</div>
-            <h3>Smart Watch</h3>
-            <p>Track your day with a modern smartwatch.</p>
-            <div class="price">₹4,999</div>
-            <a href="#" class="buy">Buy Now</a>
+
+            <div class="product-image">
+                💻
+            </div>
+
+            <h3>
+                Laptop
+            </h3>
+
+            <p>
+                Powerful laptop for work and entertainment.
+            </p>
+
+            <div class="price">
+                ₹54,999
+            </div>
+
+            <a href="#" class="buy">
+                Buy Now
+            </a>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="product-image">
+                🎧
+            </div>
+
+            <h3>
+                Wireless Headphones
+            </h3>
+
+            <p>
+                High-quality wireless audio experience.
+            </p>
+
+            <div class="price">
+                ₹2,999
+            </div>
+
+            <a href="#" class="buy">
+                Buy Now
+            </a>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="product-image">
+                ⌚
+            </div>
+
+            <h3>
+                Smart Watch
+            </h3>
+
+            <p>
+                Track your day with a modern smartwatch.
+            </p>
+
+            <div class="price">
+                ₹4,999
+            </div>
+
+            <a href="#" class="buy">
+                Buy Now
+            </a>
+
         </div>
 
     </div>
+
 </section>
+
+
+<!-- =========================
+     ARCHITECTURE SUMMARY
+========================== -->
 
 <div class="architecture">
 
-    <h2>Cloud-Native ShopRupee</h2>
+    <h2>
+        🏗️ Complete Deployment Architecture
+    </h2>
 
-    <p>
-        GitHub → Jenkins → Docker → Amazon ECR → Kubernetes
+    <p class="architecture-flow">
+
+        Developer
+        →
+        Git
+        →
+        GitHub
+        →
+        Jenkins
+        →
+        Docker
+        →
+        Amazon ECR
+        →
+        Kubernetes
+        →
+        4 Replicas
+
     </p>
 
-    <p>
-        4 application replicas across 2 Kubernetes worker nodes
-    </p>
+
+    <div class="badge">
+
+        ✅ CI/CD
+        &nbsp; | &nbsp;
+        ✅ Docker
+        &nbsp; | &nbsp;
+        ✅ Amazon ECR
+        &nbsp; | &nbsp;
+        ✅ Kubernetes
+        &nbsp; | &nbsp;
+        ✅ Rolling Update
+
+    </div>
 
 </div>
 
+
+<!-- =========================
+     FOOTER
+========================== -->
+
 <footer>
-    <p>© 2026 ShopRupee. All rights reserved.</p>
-    <p>Powered by Kubernetes & DevOps</p>
+
+    <p>
+        © 2026 ShopRupee
+    </p>
+
+    <p class="footer-tech">
+
+        Git • GitHub • Jenkins • Docker • Amazon ECR • Kubernetes
+
+    </p>
+
+    <p>
+
+        🚀 Cloud-Native DevOps Application
+
+    </p>
+
 </footer>
+
 
 </body>
 </html>
