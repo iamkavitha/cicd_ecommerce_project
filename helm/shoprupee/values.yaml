@@ -1,1 +1,44 @@
+replicaCount: 4
 
+image:
+  repository: 931527443397.dkr.ecr.ap-south-1.amazonaws.com/shoprupee
+  tag: latest
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: ecr-registry-secret
+
+nameOverride: ""
+
+fullnameOverride: ""
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 80
+  nodePort: 30081
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+  limits:
+    cpu: 250m
+    memory: 128Mi
+
+readinessProbe:
+  path: /nginx-health
+  port: 80
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 3
+
+livenessProbe:
+  path: /nginx-health
+  port: 80
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 3
