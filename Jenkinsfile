@@ -6,6 +6,10 @@ pipeline {
 
     environment {
 
+        // ============================================================
+        // AWS / ECR
+        // ============================================================
+
         AWS_REGION = 'ap-south-1'
 
         AWS_ACCOUNT_ID = '931527443397'
@@ -16,13 +20,29 @@ pipeline {
 
         ECR_IMAGE = "${ECR_REGISTRY}/${ECR_REPOSITORY}"
 
+        // Jenkins build number becomes Docker image tag
         IMAGE_TAG = "${BUILD_NUMBER}"
 
+
+        // ============================================================
+        // Kubernetes
+        // ============================================================
+
         NAMESPACE = 'shoprupee'
+
+
+        // ============================================================
+        // Helm
+        // ============================================================
 
         HELM_CHART = './helm/shoprupee'
 
         HELM_RELEASE = 'shoprupee'
+
+
+        // ============================================================
+        // Jenkins Kubernetes kubeconfig credential
+        // ============================================================
 
         KUBECONFIG_CREDENTIAL = 'shoprupee-kubeconfig'
     }
@@ -110,11 +130,11 @@ pipeline {
                     echo "======================================"
 
                     echo ""
-                    echo "Chart files:"
+                    echo "Chart directory:"
                     ls -la ${HELM_CHART}
 
                     echo ""
-                    echo "Template files:"
+                    echo "Template directory:"
                     ls -la ${HELM_CHART}/templates
 
                     echo ""
@@ -182,7 +202,7 @@ pipeline {
 
                     echo ""
                     echo "Docker images:"
-                    docker images | grep shoprupee
+                    docker images | grep shoprupee || true
 
                     echo ""
                     echo "Docker build successful."
@@ -234,13 +254,19 @@ pipeline {
                     echo "PUSH IMAGE TO ECR"
                     echo "======================================"
 
+                    echo ""
+                    echo "Pushing:"
+                    echo "${ECR_IMAGE}:${IMAGE_TAG}"
+
                     docker push ${ECR_IMAGE}:${IMAGE_TAG}
+
+                    echo ""
+                    echo "Pushing latest tag..."
 
                     docker push ${ECR_IMAGE}:latest
 
                     echo ""
-                    echo "Image pushed successfully:"
-                    echo "${ECR_IMAGE}:${IMAGE_TAG}"
+                    echo "Image pushed successfully."
                 '''
             }
         }
@@ -279,19 +305,26 @@ pipeline {
                         kubectl auth whoami
 
                         echo ""
-                        echo "Deployments:"
-                        kubectl get deployments \
-                            -n ${NAMESPACE}
+                        echo "ShopRupee Deployment:"
+                        kubectl get deployment \
+                            shoprupee \
+                            -n ${NAMESPACE} \
+                            || true
 
                         echo ""
-                        echo "Pods:"
+                        echo "ShopRupee Pods Only:"
                         kubectl get pods \
-                            -n ${NAMESPACE}
+                            -n ${NAMESPACE} \
+                            -l app=shoprupee \
+                            -o wide \
+                            || true
 
                         echo ""
-                        echo "Services:"
-                        kubectl get services \
-                            -n ${NAMESPACE}
+                        echo "ShopRupee Service:"
+                        kubectl get service \
+                            shoprupee \
+                            -n ${NAMESPACE} \
+                            || true
 
                         echo ""
                         echo "Kubernetes access successful."
@@ -392,6 +425,12 @@ pipeline {
                         echo "CREATE ECR PULL SECRET"
                         echo "======================================"
 
+                        echo ""
+                        echo "Creating/updating ECR pull secret..."
+
+                        # Do not print the temporary ECR password
+                        set +x
+
                         ECR_PASSWORD=$(aws ecr get-login-password \
                             --region ${AWS_REGION})
 
@@ -404,6 +443,10 @@ pipeline {
                             --dry-run=client \
                             -o yaml \
                         | kubectl apply -f -
+
+                        unset ECR_PASSWORD
+
+                        set -x
 
                         echo ""
                         echo "ECR pull secret created/updated."
@@ -576,7 +619,7 @@ pipeline {
 
 
         // ============================================================
-        // 15. VERIFY 4 REPLICAS
+        // 15. VERIFY 4 SHOPRUPEE REPLICAS
         // ============================================================
 
         stage('Verify 4 Replicas') {
@@ -596,7 +639,7 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "VERIFY 4 REPLICAS"
+                        echo "VERIFY 4 SHOPRUPEE REPLICAS"
                         echo "======================================"
 
                         kubectl get deployment \
@@ -623,12 +666,12 @@ pipeline {
                         fi
 
                         if [ "${READY}" != "4" ]; then
-                            echo "ERROR: 4 replicas are not ready."
+                            echo "ERROR: ShopRupee does not have 4 ready replicas."
                             exit 1
                         fi
 
                         echo ""
-                        echo "All 4 replicas are READY."
+                        echo "All 4 ShopRupee replicas are READY."
                     '''
                 }
             }
@@ -636,10 +679,10 @@ pipeline {
 
 
         // ============================================================
-        // 16. VERIFY PODS
+        // 16. VERIFY SHOPRUPEE PODS ONLY
         // ============================================================
 
-        stage('Verify Pods') {
+        stage('Verify Shoprupee Pods') {
 
             steps {
 
@@ -656,28 +699,78 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "VERIFY PODS"
+                        echo "VERIFY SHOPRUPEE PODS ONLY"
                         echo "======================================"
+
+                        echo ""
+                        echo "ShopRupee pods:"
+                        echo ""
 
                         kubectl get pods \
                             -n ${NAMESPACE} \
+                            -l app=shoprupee \
                             -o wide
 
                         echo ""
-                        echo "Checking pod statuses..."
+                        echo "Java pods are intentionally ignored."
+                        echo "This pipeline validates only app=shoprupee."
 
-                        NOT_RUNNING=$(kubectl get pods \
+                        echo ""
+                        echo "Checking ShopRupee rollout..."
+
+                        kubectl rollout status \
+                            deployment/${HELM_RELEASE} \
                             -n ${NAMESPACE} \
-                            --no-headers \
-                            | awk '$3 != "Running" {count++} END {print count+0}')
+                            --timeout=5m
 
-                        if [ "${NOT_RUNNING}" != "0" ]; then
-                            echo "ERROR: Some pods are not Running."
+                        echo ""
+                        echo "Checking ShopRupee pod count..."
+
+                        POD_COUNT=$(kubectl get pods \
+                            -n ${NAMESPACE} \
+                            -l app=shoprupee \
+                            --no-headers \
+                            | wc -l)
+
+                        echo "ShopRupee pod count: ${POD_COUNT}"
+
+                        if [ "${POD_COUNT}" != "4" ]; then
+                            echo "ERROR: Expected 4 ShopRupee pods."
                             exit 1
                         fi
 
                         echo ""
-                        echo "All ShopRupee pods are Running."
+                        echo "Checking ShopRupee pod statuses..."
+
+                        NOT_RUNNING=$(kubectl get pods \
+                            -n ${NAMESPACE} \
+                            -l app=shoprupee \
+                            --no-headers \
+                            | awk '$3 != "Running" {count++} END {print count+0}')
+
+                        if [ "${NOT_RUNNING}" != "0" ]; then
+                            echo "ERROR: One or more ShopRupee pods are not Running."
+                            exit 1
+                        fi
+
+                        echo ""
+                        echo "Checking ShopRupee READY containers..."
+
+                        NOT_READY=$(kubectl get pods \
+                            -n ${NAMESPACE} \
+                            -l app=shoprupee \
+                            --no-headers \
+                            | awk '$2 != "1/1" {count++} END {print count+0}')
+
+                        if [ "${NOT_READY}" != "0" ]; then
+                            echo "ERROR: One or more ShopRupee pods are not Ready."
+                            exit 1
+                        fi
+
+                        echo ""
+                        echo "======================================"
+                        echo "SHOPRUPEE PODS ARE HEALTHY"
+                        echo "======================================"
                     '''
                 }
             }
@@ -685,7 +778,7 @@ pipeline {
 
 
         // ============================================================
-        // 17. VERIFY SERVICE
+        // 17. VERIFY SHOPRUPEE SERVICE
         // ============================================================
 
         stage('Verify Service') {
@@ -705,8 +798,11 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "VERIFY SERVICE"
+                        echo "VERIFY SHOPRUPEE SERVICE"
                         echo "======================================"
+
+                        echo ""
+                        echo "Service:"
 
                         kubectl get service \
                             ${HELM_RELEASE} \
@@ -755,7 +851,8 @@ pipeline {
 
                         echo ""
                         echo "Helm Release:"
-                        helm list -n ${NAMESPACE}
+                        helm list \
+                            -n ${NAMESPACE}
 
                         echo ""
                         echo "Deployment:"
@@ -764,9 +861,10 @@ pipeline {
                             -n ${NAMESPACE}
 
                         echo ""
-                        echo "Pods:"
+                        echo "ShopRupee Pods Only:"
                         kubectl get pods \
                             -n ${NAMESPACE} \
+                            -l app=shoprupee \
                             -o wide
 
                         echo ""
@@ -800,7 +898,7 @@ pipeline {
 
             echo '''
 ==========================================
- SHOPRUPPE HELM PIPELINE SUCCESS
+ SHOPRUPEE HELM PIPELINE SUCCESS
 ==========================================
 
 GitHub
@@ -825,9 +923,16 @@ Helm Upgrade/Install
    ↓
 Rolling Update
    ↓
-4 Running Pods
+4 ShopRupee Pods
    ↓
-NodePort Service
+ShopRupee Service
+   ↓
+SUCCESS
+
+NOTE:
+Java application runs in the same namespace,
+but this pipeline verifies only:
+app=shoprupee
 
 SHOPRUPEE DEPLOYMENT SUCCESSFUL
 ==========================================
@@ -860,6 +965,10 @@ Possible areas:
 12. ImagePullBackOff
 13. CrashLoopBackOff
 14. Readiness/Liveness Probe
+
+NOTE:
+Java pods in the shared namespace are NOT
+used for ShopRupee pod verification.
 
 ==========================================
 '''
