@@ -16,20 +16,24 @@ pipeline {
 
         ECR_IMAGE = "${ECR_REGISTRY}/${ECR_REPOSITORY}"
 
-        NAMESPACE = 'shoprupee'
+        IMAGE_TAG = "${BUILD_NUMBER}"
 
-        HELM_RELEASE = 'shoprupee'
+        NAMESPACE = 'shoprupee'
 
         HELM_CHART = './helm/shoprupee'
 
-        KUBECONFIG_CREDENTIAL = 'shoprupee-kubeconfig'
+        HELM_RELEASE = 'shoprupee'
 
-        IMAGE_TAG = "${BUILD_NUMBER}"
+        KUBECONFIG_CREDENTIAL = 'shoprupee-jenkins-kubeconfig'
     }
 
 
     stages {
 
+
+        // ============================================================
+        // 1. VERIFY TOOLS
+        // ============================================================
 
         stage('Verify Tools') {
 
@@ -69,6 +73,10 @@ pipeline {
         }
 
 
+        // ============================================================
+        // 2. VERIFY AWS IDENTITY
+        // ============================================================
+
         stage('Verify AWS Identity') {
 
             steps {
@@ -85,6 +93,10 @@ pipeline {
             }
         }
 
+
+        // ============================================================
+        // 3. VERIFY HELM CHART
+        // ============================================================
 
         stage('Verify Helm Chart') {
 
@@ -108,10 +120,18 @@ pipeline {
                     echo ""
                     echo "Chart.yaml:"
                     cat ${HELM_CHART}/Chart.yaml
+
+                    echo ""
+                    echo "values.yaml:"
+                    cat ${HELM_CHART}/values.yaml
                 '''
             }
         }
 
+
+        // ============================================================
+        // 4. HELM LINT
+        // ============================================================
 
         stage('Helm Lint') {
 
@@ -125,10 +145,17 @@ pipeline {
                     echo "======================================"
 
                     helm lint ${HELM_CHART}
+
+                    echo ""
+                    echo "Helm lint successful."
                 '''
             }
         }
 
+
+        // ============================================================
+        // 5. DOCKER BUILD
+        // ============================================================
 
         stage('Docker Build') {
 
@@ -141,6 +168,7 @@ pipeline {
                     echo "DOCKER BUILD"
                     echo "======================================"
 
+                    echo ""
                     echo "Building image:"
                     echo "${ECR_IMAGE}:${IMAGE_TAG}"
 
@@ -155,10 +183,17 @@ pipeline {
                     echo ""
                     echo "Docker images:"
                     docker images | grep shoprupee
+
+                    echo ""
+                    echo "Docker build successful."
                 '''
             }
         }
 
+
+        // ============================================================
+        // 6. ECR LOGIN
+        // ============================================================
 
         stage('ECR Login') {
 
@@ -177,11 +212,16 @@ pipeline {
                         --username AWS \
                         --password-stdin ${ECR_REGISTRY}
 
+                    echo ""
                     echo "ECR login successful."
                 '''
             }
         }
 
+
+        // ============================================================
+        // 7. PUSH IMAGE TO ECR
+        // ============================================================
 
         stage('Push Image to ECR') {
 
@@ -205,6 +245,10 @@ pipeline {
             }
         }
 
+
+        // ============================================================
+        // 8. VERIFY KUBERNETES ACCESS
+        // ============================================================
 
         stage('Verify Kubernetes Access') {
 
@@ -231,20 +275,23 @@ pipeline {
                         kubectl config current-context
 
                         echo ""
-                        echo "Namespace:"
-                        kubectl get namespace ${NAMESPACE}
+                        echo "Current Kubernetes User:"
+                        kubectl auth whoami
 
                         echo ""
                         echo "Deployments:"
-                        kubectl get deployments -n ${NAMESPACE}
+                        kubectl get deployments \
+                            -n ${NAMESPACE}
 
                         echo ""
                         echo "Pods:"
-                        kubectl get pods -n ${NAMESPACE}
+                        kubectl get pods \
+                            -n ${NAMESPACE}
 
                         echo ""
                         echo "Services:"
-                        kubectl get services -n ${NAMESPACE}
+                        kubectl get services \
+                            -n ${NAMESPACE}
 
                         echo ""
                         echo "Kubernetes access successful."
@@ -253,6 +300,10 @@ pipeline {
             }
         }
 
+
+        // ============================================================
+        // 9. VERIFY KUBERNETES RBAC
+        // ============================================================
 
         stage('Verify Kubernetes RBAC') {
 
@@ -271,46 +322,42 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "VERIFY KUBERNETES RBAC"
+                        echo "KUBERNETES RBAC"
                         echo "======================================"
 
                         echo ""
-                        echo "Current user:"
-                        kubectl auth whoami
-
-                        echo ""
-                        echo "Deployment GET:"
+                        echo "Get Deployments:"
                         kubectl auth can-i get deployments \
                             -n ${NAMESPACE}
 
                         echo ""
-                        echo "Deployment UPDATE:"
+                        echo "Update Deployments:"
                         kubectl auth can-i update deployments \
                             -n ${NAMESPACE}
 
                         echo ""
-                        echo "Deployment PATCH:"
+                        echo "Patch Deployments:"
                         kubectl auth can-i patch deployments \
                             -n ${NAMESPACE}
 
                         echo ""
-                        echo "Pods GET:"
+                        echo "Get Pods:"
                         kubectl auth can-i get pods \
                             -n ${NAMESPACE}
 
                         echo ""
-                        echo "Services CREATE:"
-                        kubectl auth can-i create services \
+                        echo "Get ReplicaSets:"
+                        kubectl auth can-i get replicasets \
                             -n ${NAMESPACE}
 
                         echo ""
-                        echo "Secrets CREATE:"
+                        echo "Create Secrets:"
                         kubectl auth can-i create secrets \
                             -n ${NAMESPACE}
 
                         echo ""
-                        echo "ReplicaSets GET:"
-                        kubectl auth can-i get replicasets \
+                        echo "Create Services:"
+                        kubectl auth can-i create services \
                             -n ${NAMESPACE}
 
                         echo ""
@@ -320,6 +367,10 @@ pipeline {
             }
         }
 
+
+        // ============================================================
+        // 10. CREATE / UPDATE ECR PULL SECRET
+        // ============================================================
 
         stage('Create ECR Pull Secret') {
 
@@ -344,18 +395,21 @@ pipeline {
                         ECR_PASSWORD=$(aws ecr get-login-password \
                             --region ${AWS_REGION})
 
-                        kubectl create secret docker-registry ecr-registry-secret \
+                        kubectl create secret docker-registry \
+                            ecr-registry-secret \
                             --docker-server=${ECR_REGISTRY} \
                             --docker-username=AWS \
                             --docker-password="${ECR_PASSWORD}" \
-                            --namespace=${NAMESPACE} \
+                            -n ${NAMESPACE} \
                             --dry-run=client \
                             -o yaml \
                         | kubectl apply -f -
 
                         echo ""
-                        echo "ECR pull secret:"
-                        kubectl get secret ecr-registry-secret \
+                        echo "ECR pull secret created/updated."
+
+                        kubectl get secret \
+                            ecr-registry-secret \
                             -n ${NAMESPACE}
                     '''
                 }
@@ -363,35 +417,38 @@ pipeline {
         }
 
 
+        // ============================================================
+        // 11. HELM TEMPLATE
+        // ============================================================
+
         stage('Helm Template') {
 
             steps {
 
-                withCredentials([
-                    file(
-                        credentialsId: "${KUBECONFIG_CREDENTIAL}",
-                        variable: 'KUBECONFIG_FILE'
-                    )
-                ]) {
+                sh '''
+                    set -e
 
-                    sh '''
-                        set -e
+                    echo "======================================"
+                    echo "HELM TEMPLATE"
+                    echo "======================================"
 
-                        export KUBECONFIG="${KUBECONFIG_FILE}"
+                    helm template \
+                        ${HELM_RELEASE} \
+                        ${HELM_CHART} \
+                        --namespace ${NAMESPACE} \
+                        --set image.repository=${ECR_IMAGE} \
+                        --set image.tag=${IMAGE_TAG}
 
-                        echo "======================================"
-                        echo "HELM TEMPLATE"
-                        echo "======================================"
-
-                        helm template ${HELM_RELEASE} ${HELM_CHART} \
-                            --namespace ${NAMESPACE} \
-                            --set image.repository=${ECR_IMAGE} \
-                            --set image.tag=${IMAGE_TAG}
-                    '''
-                }
+                    echo ""
+                    echo "Helm template generated successfully."
+                '''
             }
         }
 
+
+        // ============================================================
+        // 12. DEPLOY WITH HELM
+        // ============================================================
 
         stage('Deploy with Helm') {
 
@@ -410,10 +467,24 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo "======================================"
-                        echo "HELM DEPLOYMENT"
+                        echo "DEPLOY WITH HELM"
                         echo "======================================"
 
-                        helm upgrade --install ${HELM_RELEASE} ${HELM_CHART} \
+                        echo ""
+                        echo "Helm Release:"
+                        echo "${HELM_RELEASE}"
+
+                        echo ""
+                        echo "Namespace:"
+                        echo "${NAMESPACE}"
+
+                        echo ""
+                        echo "Image:"
+                        echo "${ECR_IMAGE}:${IMAGE_TAG}"
+
+                        helm upgrade --install \
+                            ${HELM_RELEASE} \
+                            ${HELM_CHART} \
                             --namespace ${NAMESPACE} \
                             --set image.repository=${ECR_IMAGE} \
                             --set image.tag=${IMAGE_TAG} \
@@ -427,6 +498,10 @@ pipeline {
             }
         }
 
+
+        // ============================================================
+        // 13. ROLLING UPDATE
+        // ============================================================
 
         stage('Rolling Update') {
 
@@ -449,14 +524,21 @@ pipeline {
                         echo "======================================"
 
                         kubectl rollout status \
-                            deployment/shoprupee \
+                            deployment/${HELM_RELEASE} \
                             -n ${NAMESPACE} \
                             --timeout=5m
+
+                        echo ""
+                        echo "Rolling update completed."
                     '''
                 }
             }
         }
 
+
+        // ============================================================
+        // 14. VERIFY HELM RELEASE
+        // ============================================================
 
         stage('Verify Helm Release') {
 
@@ -482,14 +564,20 @@ pipeline {
                             -n ${NAMESPACE}
 
                         echo ""
-                        echo "Release status:"
-                        helm status ${HELM_RELEASE} \
+                        echo "Helm release details:"
+
+                        helm status \
+                            ${HELM_RELEASE} \
                             -n ${NAMESPACE}
                     '''
                 }
             }
         }
 
+
+        // ============================================================
+        // 15. VERIFY 4 REPLICAS
+        // ============================================================
 
         stage('Verify 4 Replicas') {
 
@@ -511,27 +599,45 @@ pipeline {
                         echo "VERIFY 4 REPLICAS"
                         echo "======================================"
 
-                        kubectl get deployment shoprupee \
+                        kubectl get deployment \
+                            ${HELM_RELEASE} \
                             -n ${NAMESPACE}
 
-                        READY=$(kubectl get deployment shoprupee \
+                        DESIRED=$(kubectl get deployment \
+                            ${HELM_RELEASE} \
+                            -n ${NAMESPACE} \
+                            -o jsonpath='{.spec.replicas}')
+
+                        READY=$(kubectl get deployment \
+                            ${HELM_RELEASE} \
                             -n ${NAMESPACE} \
                             -o jsonpath='{.status.readyReplicas}')
 
                         echo ""
-                        echo "Ready replicas: ${READY}"
+                        echo "Desired replicas: ${DESIRED}"
+                        echo "Ready replicas:   ${READY}"
 
-                        if [ "${READY}" != "4" ]; then
-                            echo "ERROR: Expected 4 ready replicas."
+                        if [ "${DESIRED}" != "4" ]; then
+                            echo "ERROR: Expected 4 replicas."
                             exit 1
                         fi
 
-                        echo "4 replicas are running."
+                        if [ "${READY}" != "4" ]; then
+                            echo "ERROR: 4 replicas are not ready."
+                            exit 1
+                        fi
+
+                        echo ""
+                        echo "All 4 replicas are READY."
                     '''
                 }
             }
         }
 
+
+        // ============================================================
+        // 16. VERIFY PODS
+        // ============================================================
 
         stage('Verify Pods') {
 
@@ -558,7 +664,7 @@ pipeline {
                             -o wide
 
                         echo ""
-                        echo "Checking pod status..."
+                        echo "Checking pod statuses..."
 
                         NOT_RUNNING=$(kubectl get pods \
                             -n ${NAMESPACE} \
@@ -577,6 +683,10 @@ pipeline {
             }
         }
 
+
+        // ============================================================
+        // 17. VERIFY SERVICE
+        // ============================================================
 
         stage('Verify Service') {
 
@@ -598,28 +708,29 @@ pipeline {
                         echo "VERIFY SERVICE"
                         echo "======================================"
 
-                        kubectl get service shoprupee \
+                        kubectl get service \
+                            ${HELM_RELEASE} \
                             -n ${NAMESPACE}
 
                         echo ""
-                        echo "Service details:"
+                        echo "Service endpoints:"
 
-                        kubectl get service shoprupee \
+                        kubectl get endpoints \
+                            ${HELM_RELEASE} \
                             -n ${NAMESPACE} \
-                            -o wide
+                            || true
 
                         echo ""
-                        echo "ShopRupee NodePort:"
-                        kubectl get service shoprupee \
-                            -n ${NAMESPACE} \
-                            -o jsonpath='{.spec.ports[0].nodePort}'
-
-                        echo ""
+                        echo "Service verification completed."
                     '''
                 }
             }
         }
 
+
+        // ============================================================
+        // 18. FINAL VERIFICATION
+        // ============================================================
 
         stage('Final Verification') {
 
@@ -638,17 +749,18 @@ pipeline {
                         export KUBECONFIG="${KUBECONFIG_FILE}"
 
                         echo ""
-                        echo "=========================================="
-                        echo "SHOPRUPEE DEPLOYMENT SUCCESSFUL"
-                        echo "=========================================="
+                        echo "================================================"
+                        echo "        SHOPRUPEE DEPLOYMENT SUCCESS"
+                        echo "================================================"
 
                         echo ""
-                        echo "Helm:"
+                        echo "Helm Release:"
                         helm list -n ${NAMESPACE}
 
                         echo ""
                         echo "Deployment:"
                         kubectl get deployment \
+                            ${HELM_RELEASE} \
                             -n ${NAMESPACE}
 
                         echo ""
@@ -660,6 +772,7 @@ pipeline {
                         echo ""
                         echo "Service:"
                         kubectl get service \
+                            ${HELM_RELEASE} \
                             -n ${NAMESPACE}
 
                         echo ""
@@ -667,11 +780,9 @@ pipeline {
                         echo "${ECR_IMAGE}:${IMAGE_TAG}"
 
                         echo ""
-                        echo "Application:"
-                        echo "http://13.232.204.142:30081/"
-
-                        echo ""
-                        echo "=========================================="
+                        echo "================================================"
+                        echo "        DEPLOYMENT COMPLETED SUCCESSFULLY"
+                        echo "================================================"
                     '''
                 }
             }
@@ -679,27 +790,50 @@ pipeline {
     }
 
 
+    // ================================================================
+    // POST ACTIONS
+    // ================================================================
+
     post {
 
         success {
 
             echo '''
 ==========================================
- SHOPRUPEE HELM PIPELINE SUCCESS
+ SHOPRUPPE HELM PIPELINE SUCCESS
 ==========================================
 
-Docker image built and pushed.
-Helm chart validated.
-Kubernetes RBAC verified.
-ECR pull secret created.
-Application deployed with Helm.
-Rolling update completed.
-4 replicas verified.
-Service verified.
+GitHub
+   ↓
+Jenkins
+   ↓
+Docker Build
+   ↓
+Amazon ECR
+   ↓
+Kubernetes Authentication
+   ↓
+RBAC
+   ↓
+ECR Pull Secret
+   ↓
+Helm Lint
+   ↓
+Helm Template
+   ↓
+Helm Upgrade/Install
+   ↓
+Rolling Update
+   ↓
+4 Running Pods
+   ↓
+NodePort Service
 
+SHOPRUPEE DEPLOYMENT SUCCESSFUL
 ==========================================
 '''
         }
+
 
         failure {
 
