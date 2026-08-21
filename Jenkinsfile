@@ -1,8 +1,6 @@
 pipeline {
 
-    agent {
-        label 'djworker3'
-    }
+    agent any
 
     environment {
 
