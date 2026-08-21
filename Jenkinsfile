@@ -10,9 +10,9 @@ pipeline {
         // AWS / ECR
         // ============================================================
 
-        AWS_REGION = 'ap-south-1'
+        AWS_REGION = 'us-east-1'
 
-        AWS_ACCOUNT_ID = '931527443397'
+        AWS_ACCOUNT_ID = '369559608554'
 
         ECR_REPOSITORY = 'shoprupee'
 
