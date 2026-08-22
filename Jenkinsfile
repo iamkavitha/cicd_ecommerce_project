@@ -181,7 +181,7 @@ pipeline {
 
                     docker tag \
                         ${ECR_IMAGE}:${IMAGE_TAG} \
-                        ${ECR_IMAG}:latest
+                        ${ECR_IMAGE}:latest
 
                     echo ""
                     echo "Docker images:"

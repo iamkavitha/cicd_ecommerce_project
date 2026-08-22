@@ -28,7 +28,7 @@ resources:
     memory: 128Mi
 
 readinessProbe:
-  path: /nginx-health
+  path: /invalid-health
   port: 80
   initialDelaySeconds: 5
   periodSeconds: 5
