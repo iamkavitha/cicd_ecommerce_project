@@ -12,7 +12,7 @@ pipeline {
 
         AWS_ACCOUNT_ID = '369559608554'
 
-        ECR_REPOSITORY = 'shoprupee'
+        ECR_REPOSITORY = 'cicd_ecommerce'
 
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
