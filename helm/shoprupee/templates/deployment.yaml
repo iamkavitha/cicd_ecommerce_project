@@ -31,11 +31,11 @@ spec:
       imagePullSecrets:
         {{- toYaml .Values.imagePullSecrets | nindent 8 }}
 
-      tolerations:
-        - key: "dedicated"
-          operator: "Equal"
-          value: "worker"
-          effect: "NoSchedule"
+#      tolerations:
+#        - key: "dedicated"
+#          operator: "Equal"
+#          value: "worker"
+#          effect: "NoSchedule"
 
       containers:
 
