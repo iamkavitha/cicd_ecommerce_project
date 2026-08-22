@@ -1,7 +1,7 @@
 replicaCount: 4
 
 image:
-  repository: 931527443397.dkr.ecr.ap-south-1.amazonaws.com/shoprupee
+  repository: 931527443397.dkr.ecr.ap-south-1.amazonaws.com/cicd_ecommerce
   tag: latest
   pullPolicy: Always
 

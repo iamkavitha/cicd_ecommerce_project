@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: shoprupee-pod
+  namespace: shoprupee
+
+spec:
+  nodeSelector:
+    dedicated: worker
+
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "worker"
+      effect: "NoSchedule"
+
+  containers:
+    - name: shoprupee
+      image: nginx:latest
+
+      ports:
+        - containerPort: 80
+          protocol: TCP
