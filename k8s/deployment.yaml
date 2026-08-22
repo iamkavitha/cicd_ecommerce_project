@@ -28,6 +28,12 @@ spec:
       imagePullSecrets:
         - name: ecr-registry-secret
 
+#      tolerations:
+#        - key: "dedicated"
+#          operator: "Equal"
+#          value: "worker"
+#          effect: "NoSchedule"
+
       containers:
 
         - name: shoprupee
