@@ -478,34 +478,34 @@ pipeline {
         }
 
 
-        // ============================================================
-        // 13. ROLLING UPDATE
-        // ============================================================
+//         ============================================================
+//         13. ROLLING UPDATE
+//         ============================================================
 
-//         stage('Rolling Update') {
-//             steps {
-//                 sh '''
-//                     set -e
-//
-//                     echo "======================================"
-//                     echo "ROLLING UPDATE"
-//                     echo "======================================"
-//
-//                     kubectl rollout status \
-//                         deployment/${HELM_RELEASE} \
-//                         -n ${NAMESPACE} \
-//                         --timeout=5m
-//
-//                     echo ""
-//                     echo "Rolling update completed."
-//                 '''
-//             }
-//         }
+        stage('Rolling Update') {
+            steps {
+                sh '''
+                    set -e
+
+                    echo "======================================"
+                    echo "ROLLING UPDATE"
+                    echo "======================================"
+
+                    kubectl rollout status \
+                        deployment/${HELM_RELEASE} \
+                        -n ${NAMESPACE} \
+                        --timeout=5m
+
+                    echo ""
+                    echo "Rolling update completed."
+                '''
+            }
+        }
 
 
-        // ============================================================
-        // 14. VERIFY HELM RELEASE
-        // ============================================================
+//         ============================================================
+//         14. VERIFY HELM RELEASE
+//         ============================================================
 
         stage('Verify Helm Release') {
             steps {
